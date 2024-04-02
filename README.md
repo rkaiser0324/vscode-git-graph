@@ -1,6 +1,7 @@
 # Git Graph extension for Visual Studio Code
 
 Fork of mhutchies Git Graph with further improvements.  
+
 Main improvements:
 
 * Added button to jump to HEAD (hansu#14)
@@ -10,6 +11,14 @@ Main improvements:
 * Added sticky header option (mhutchie#132)
 
 ![Additions](https://github.com/hansu/vscode-git-graph/raw/master/resources/demo.gif)
+
+## Install
+
+<ctrl> <shift> P
+
+disable git graph extension on Extension Development Host window and reload
+
+open a folder with a Git repo
 
 ## Features
 
