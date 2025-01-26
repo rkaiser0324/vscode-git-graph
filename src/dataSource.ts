@@ -988,25 +988,30 @@ export class DataSource extends Disposable {
 		const currentFilePath = __filename;
 		const currentDirectoryPath = path.dirname(currentFilePath).replace(/\\/g, '/');
 
+		// Modified from getCommitDistanceFromHead
+		let currentBranch = await this.runGitCommand(['branch', '--show-current'], repo);
+		if (!currentBranch) {
+			return 'No current branch';
+		}
+
+		let branches = await this.runGitCommand([
+			'branch',
+			'--format=%(refname:short)',
+			'--contains',
+			commitHash
+			 ], repo);
+
+			 let inCurrentBranch = branches ? branches.split(/\r\n|\r|\n/).includes(currentBranch) : false;
+			 if (!inCurrentBranch)
+			return 'Not in current branch';
+
 
 		return this.spawnGit([
 			'rev-list',
 			'--count',
 			commitHash + '^..HEAD'
-				 ], repo, (stdout) => {
-			// if (stdout !== '')
-			// Stick everything on one line to make it easier to parse
-			return stdout.trim().replace(/\s+/g, ' ');
-		}).then((subject) => {
-			// Success
-			if (subject) {
-				this.logger.logCmd(subject, []);
-			}
-			return subject;
-		}, (reason:string) => {
-			// Failure
-			this.logger.logCmd('rev-list failed ' + reason, []);
-			return reason;
+		], repo, (stdout) => {
+			return stdout.trim(); // /.replace(/\s+/g, ' ');
 		}).then(numCommits => {
 			// Actually don't quote it per https://stackoverflow.com/questions/12310468/node-js-child-process-issue-with-args-quotes-issue-ffmpeg-issue
 			return this.spawnGit([

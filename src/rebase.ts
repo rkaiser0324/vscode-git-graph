@@ -21,12 +21,6 @@ import * as fs from 'fs';
 import { exit } from 'process';
 import { exec, execSync } from 'child_process';
 
-// const action = process.argv[2];
-// const numCommitsBackArg = process.argv[3];
-// const countArg = process.argv[4];
-
-console.log(process.argv);
-
 // Parse command-line arguments
 const args = process.argv.slice(2);
 const options: Options = {
@@ -45,15 +39,11 @@ for (let i = 0; i < args.length; i += 2) {
 			options.action = value;
 			break;
 		case '--n':
-			let numOrHash = parseInt(value, 10);
-			if (!numOrHash) {
-
-				 // console.log('not an integer');
+			if (value.match(/[a-zA-Z]/)) {
 				options.numCommitsBack = getCommitDistanceFromHead(value);
 			}	else {
-				options.numCommitsBack = numOrHash;
+				options.numCommitsBack = parseInt(value, 10);
 			}
-			// exit(1);
 			break;
 		case '--c':
 			options.count = parseInt(value, 10);
@@ -95,7 +85,6 @@ if (!numCommitsBack) {
 	usage();
 }
 
-// numCommitsBack = parseInt(numCommitsBackArg, 10);
 if (numCommitsBack === -1) {
 	console.error('Invalid hash; it is not on the current branch.');
 	usage();
@@ -105,23 +94,24 @@ if (numCommitsBack < 1) {
 	usage();
 }
 
+if (!options.filename) {
+	console.error('Filename not specified.');
+	usage();
+}
+
 function getCommitDistanceFromHead(commitHash:string):number {
 	let count = -1;
-	try {
-		// This throws an error if the commit is not an ancestor
-		// execSync(`git merge-base --is-ancestor ${commitHash} HEAD`, { stdio: 'ignore' });
 
-		let response = execSync(`git rev-list --count ${commitHash}^..HEAD`, { encoding: 'utf8' }).trim();
-		console.log(response);
+	let currentBranch = execSync('git branch --show-current', { encoding: 'utf8' }).trim();
+
+	let response = execSync(`git branch --format=%(refname:short) --contains ${commitHash}`, { encoding: 'utf8' });
+
+	let inCurrentBranch = response.split(/\r\n|\r|\n/).includes(currentBranch);
+	if (inCurrentBranch) {
+		response = execSync(`git rev-list --count ${commitHash}^..HEAD`, { encoding: 'utf8' }).trim();
 		count = parseInt(response, 10);
-
-	} catch (error) {
-		console.log(error);
-		exit(-23);
-		// no-op
-	} finally {
-		return count;
 	}
+	return count;
 }
 
 function getLatestCommits(count: number):Promise<{hash: string, shortMessage: string}[]> {
