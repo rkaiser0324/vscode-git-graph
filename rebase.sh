@@ -82,3 +82,4 @@ GIT_SEQUENCE_EDITOR='sed -i "1s/^pick/reword/"' GIT_EDITOR="printf \"%s\n\" \"my
 
 # set the message on the 4th commit
 COMMIT_MESSAGE="new message here" GIT_SEQUENCE_EDITOR='sed -i "1s/^pick/reword/"' GIT_EDITOR="printf \"%s\n\" \"$COMMIT_MESSAGE\" >" git rebase -i  HEAD~4
+

@@ -10,6 +10,9 @@
 
 @echo off
 @REM set "filename=%1"
-echo "filename=%1"
+@REM echo "filename=%1"
 powershell.exe -File "H:\\shared\\digipowers\\vscode-git-graph\\reword-fromc.ps1" -FilePath %1
 exit /b 0
+
+
+@REM powershell.exe -File "H:\\shared\\digipowers\\vscode-git-graph\\reword-fromc.ps1" -FilePath %1

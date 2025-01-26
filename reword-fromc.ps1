@@ -24,4 +24,6 @@ if (!(Test-Path -Path $FilePath)) {
 
 
 # works from PS console
-$env:GIT_SEQUENCE_EDITOR = "H:\\shared\\digipowers\\vscode-git-graph\\reword.bat"; git rebase -i HEAD~1
+# $env:GIT_SEQUENCE_EDITOR = "H:\\shared\\digipowers\\vscode-git-graph\\reword.bat"; git rebase -i HEAD~1
+
+# $env:GIT_SEQUENCE_EDITOR = "powershell.exe -File 'H:\\shared\\digipowers\\vscode-git-graph\\reword-fromc.ps1' -FilePath '%1'"; git rebase -i HEAD~1
