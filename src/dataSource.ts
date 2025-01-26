@@ -970,10 +970,10 @@ export class DataSource extends Disposable {
 	 * Reword the message of a commit.
 	 *
 	 * @param repo The path of the repository.
-	 * @param firstCommit
+	 * @param commitHash The hash of the commit to reword.
 	 * @returns The ErrorInfo from the executed command.
 	 */
-	public async rewordCommit(repo: string, commitHash: string, _numCommits: number) {
+	public async rewordCommit(repo: string, commitHash: string) {
 
 		// Check for clean tree
 		/*
@@ -983,43 +983,31 @@ export class DataSource extends Disposable {
 			}).then((subject) => subject, () => null);
 	*/
 
-		// '-c sequence.editor="ts-node H:/shared/digipowers/vscode-git-graph/src/rebase.ts --action reword --n 3" -c core.editor="code --wait" rebase -i HEAD~3'
-
-		// eslint-disable-next-line
-				// @ts-ignore-next-line
-
-		// TODO ************ this doesn't work for the compiled JS
 		const path = require('path');
 
 		const currentFilePath = __filename;
 		const currentDirectoryPath = path.dirname(currentFilePath).replace(/\\/g, '/');
-		// this.logger.logCmd('path: ' + currentDirectoryPath, []);
-		/*
-		function getCommitDistanceFromHead(commitHash:string):number {
-			let count = -1;
-			try {
-				// This throws an error if the commit is not an ancestor
-				execSync(`git merge-base --is-ancestor ${commitHash} HEAD`, { stdio: 'ignore' });
 
-				count = parseInt(execSync(`git rev-list --count ${commitHash}^..HEAD`, { encoding: 'utf8' }).trim());
+		let status = await this.runGitCommand(['rev-list', '--count', commitHash + '^..HEAD'], repo);
 
-			} catch (error) {
-				// no-op
-			} finally {
-				return count;
-			}
+		if (status) {
+			let numCommits = status.trim().replace(/\s+/g, ' ');
+
+
+			status = await this.runGitCommand([
+				'-c',
+				// eslint-disable-next-line
+				`sequence.editor=node ${currentDirectoryPath}/rebase.js --action reword --n ` + numCommits,
+				'-c',
+				// eslint-disable-next-line
+				"core.editor=code --wait",
+				'rebase',
+				'-i',
+				'HEAD~' + numCommits], repo);
 		}
-*/
 
-
+		return status;
 		/*
-		 git -c "sequence.editor=ts-node H:/shared/digipowers/vscode-git-graph/src/rebase.ts --action reword --n 2" -c "core.editor=code --wait" rebase -i HEAD~2
-
-
-		 node h:/shared/digipowers/vscode-git-graph/out/rebase.mjs --action reword --n 2
-
-		this.logger.logCmd('hash=' + commitHash, []);
-*/
 
 		return this.spawnGit([
 			'rev-list',
@@ -1063,7 +1051,7 @@ export class DataSource extends Disposable {
 			});
 		}, () => null);
 
-
+*/
 
 		/*
 		let status = this.spawnGit([
