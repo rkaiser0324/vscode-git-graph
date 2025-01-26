@@ -261,9 +261,13 @@ export class GitGraphView extends Disposable {
 			case 'rewordCommit':
 				// rwk
 
+				// TODO -- msg.commitHash is undefined
+
 				// eslint-disable-next-line
 					// @ts-ignore-next-line
-				let _data2 = this.dataSource.rewordCommit(msg.repo, 1, 3);
+				let response = await this.dataSource.rewordCommit(msg.repo, msg.commitHash);
+
+				// showErrorMessage('Cannot reword. ' + response);
 				// console.log(_data);
 
 
@@ -276,9 +280,13 @@ export class GitGraphView extends Disposable {
 				// 	msg.avatarEmail !== null ? this.avatarManager.getAvatarImage(msg.avatarEmail) : Promise.resolve(null)
 				// ]);
 
+				// if (!(await this.repoManager.searchWorkspaceForRepos())) {
+				// 	showErrorMessage('Cannot reword.');
+				// }
+
 				// debugger;
 				// this.sendMessage({
-				// 	command: 'combineCommits',
+				// 	command: 'rwk',
 				// 	error: 'there was an error'
 				// });
 				break;

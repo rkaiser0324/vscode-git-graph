@@ -973,7 +973,7 @@ export class DataSource extends Disposable {
 	 * @param firstCommit
 	 * @returns The ErrorInfo from the executed command.
 	 */
-	public rewordCommit(repo: string, _firstCommit: number, _numCommits: number) {
+	public async rewordCommit(repo: string, commitHash: string, _numCommits: number) {
 
 		// Check for clean tree
 		/*
@@ -993,29 +993,66 @@ export class DataSource extends Disposable {
 
 		// const currentFilePath = __filename;
 		// const currentDirectoryPath = path.dirname(currentFilePath);
+		/*
+		function getCommitDistanceFromHead(commitHash:string):number {
+			let count = -1;
+			try {
+				// This throws an error if the commit is not an ancestor
+				execSync(`git merge-base --is-ancestor ${commitHash} HEAD`, { stdio: 'ignore' });
 
-		// Actually don't quote it per https://stackoverflow.com/questions/12310468/node-js-child-process-issue-with-args-quotes-issue-ffmpeg-issue
-			 let status = this.spawnGit([
-			'-c',
-			// eslint-disable-next-line
-			"sequence.editor=ts-node H:/shared/digipowers/vscode-git-graph/src/rebase.ts --action reword --n 3",
-			'-c',
+				count = parseInt(execSync(`git rev-list --count ${commitHash}^..HEAD`, { encoding: 'utf8' }).trim());
+
+			} catch (error) {
+				// no-op
+			} finally {
+				return count;
+			}
+		}
+*/
 
 
-			// eslint-disable-next-line
-			"core.editor=code --wait",
-			'rebase',
-			'-i',
-			'HEAD~3'
+		this.logger.logCmd(commitHash, []);
+
+		return this.spawnGit([
+			'merge-base',
+			'--is-ancestor',
+			commitHash,
+			'HEAD'
 				 ], repo, (stdout) => {
 			if (stdout !== '')
 				return stdout; // .trim().replace(/\s+/g, ' ');
 		}).then((subject) => {
+
+			if (subject) this.logger.logCmd(subject, []);
 			return subject;
 		}, (reason) => {
-
+			if (reason) this.logger.logCmd(reason, []);
 			return reason;
-		});
+		}).then(numCommits => {
+			// Actually don't quote it per https://stackoverflow.com/questions/12310468/node-js-child-process-issue-with-args-quotes-issue-ffmpeg-issue
+			this.spawnGit([
+				'-c',
+				// eslint-disable-next-line
+						"sequence.editor=ts-node H:/shared/digipowers/vscode-git-graph/src/rebase.ts --action reword --n " + numCommits,
+				'-c',
+				// eslint-disable-next-line
+						"core.editor=code --wait",
+				'rebase',
+				'-i',
+				'HEAD~' + numCommits
+							 ], repo, (stdout) => {
+				if (stdout !== '')
+					return stdout; // .trim().replace(/\s+/g, ' ');
+			}).then((subject) => {
+				return subject;
+			}, (reason) => {
+
+				return reason;
+			});
+		}, () => null);
+
+
+
 		/*
 		let status = this.spawnGit([
 			'-c sequence.editor="ts-node "H:\\shared\\digipowers\\vscode-git-graph\\src\\rebase.ts" --action reword --n 3',
@@ -1036,7 +1073,7 @@ export class DataSource extends Disposable {
 		// if (remoteBranch === null) args.push(branchName);
 		// else args.push('-b', branchName, remoteBranch);
 
-		return status;
+		// return status;
 	}
 
 	/**

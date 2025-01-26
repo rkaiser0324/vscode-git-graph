@@ -695,7 +695,7 @@ export interface ResponseCombineCommits extends ResponseWithErrorInfo {
 
 export interface RequestRewordCommit extends RepoRequest {
 	readonly command: 'rewordCommit';
-	readonly firstCommit: number;
+	readonly commitHash: string;
 }
 
 export interface ResponseRewordCommit extends ResponseWithErrorInfo {
