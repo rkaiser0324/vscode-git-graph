@@ -1,18 +1,8 @@
-@REM @echo off
-@REM set "filepath=%1"
-@REM for /f "tokens=*" %%a in ('type "%filepath%"') do (
-@REM   set "line=%%a"
-@REM   set "line=!line:pick=reword!"
-@REM   echo !line!>>temp.txt
-@REM )
-@REM del %filepath%
-@REM type temp.txt>%filepath%
+@REM reword.bat <filename> <action=reword|combine> [count]
+
 
 @echo off
-@REM set "filename=%1"
-@REM echo "filename=%1"
-powershell.exe -File "H:\\shared\\digipowers\\vscode-git-graph\\reword-fromc.ps1" -FilePath %1
+
+ts-node "H:\\shared\\digipowers\\vscode-git-graph\\src\\reword.ts" %1 %2 %3
 exit /b 0
 
-
-@REM powershell.exe -File "H:\\shared\\digipowers\\vscode-git-graph\\reword-fromc.ps1" -FilePath %1

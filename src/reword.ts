@@ -3,7 +3,9 @@
 /*
 npm install -g ts-node
 
-ts-node src/reword.ts <FilePath> <action> <count>
+* use "dummy" when not calling via reword.bat
+
+ts-node src/reword.ts dummy <FilePath> <action> <count>
 
 */
 
@@ -12,6 +14,8 @@ import * as fs from 'fs';
 const filePath = process.argv[2];
 const action = process.argv[3];
 const countArg = process.argv[4];
+
+console.log(process.argv);
 
 if (!filePath) {
 	console.error('Usage: node script.ts <FilePath> <action> [count]');
