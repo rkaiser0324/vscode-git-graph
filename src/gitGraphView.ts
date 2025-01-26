@@ -263,33 +263,6 @@ export class GitGraphView extends Disposable {
 					command: 'rewordCommit',
 					error: await this.dataSource.rewordCommit(msg.repo, msg.commitHash)
 				});
-
-				// eslint-disable-next-line
-					// @ts-ignore-next-line
-				// let response = await this.dataSource.rewordCommit(msg.repo, msg.commitHash);
-
-				// showErrorMessage('Cannot reword. ' + response);
-				// console.log(_data);
-
-
-				// let data = await Promise.all<GitCommitDetailsData, string | null>([
-				// 	msg.commitHash === UNCOMMITTED
-				// 		? this.dataSource.getUncommittedDetails(msg.repo)
-				// 		: msg.stash === null
-				// 			? this.dataSource.getCommitDetails(msg.repo, msg.commitHash, msg.hasParents)
-				// 			: this.dataSource.getStashDetails(msg.repo, msg.commitHash, msg.stash),
-				// 	msg.avatarEmail !== null ? this.avatarManager.getAvatarImage(msg.avatarEmail) : Promise.resolve(null)
-				// ]);
-
-				// if (!(await this.repoManager.searchWorkspaceForRepos())) {
-				// 	showErrorMessage('Cannot reword.');
-				// }
-
-				// debugger;
-				// this.sendMessage({
-				// 	command: 'rwk',
-				// 	error: 'there was an error'
-				// });
 				break;
 			case 'commitDetails':
 				let data = await Promise.all<GitCommitDetailsData, string | null>([

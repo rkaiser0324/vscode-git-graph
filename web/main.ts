@@ -1267,25 +1267,6 @@ class GitGraphView {
 				title: 'Reword Commit' + ELLIPSIS,
 				visible: true, //	visibility.drop && this.graph.dropCommitPossible(this.commitLookup[hash]),
 				onClick: () => {
-
-					// 					debugger;
-					// 					// git merge-base --is-ancestor a1b2c3 HEAD - shoule return 0 if a1b2c3 is an ancestor of HEAD
-
-					// 					// then
-					// 					// git rev-list --count <hash>^..HEAD
-
-					// 					/*
-					// if git merge-base --is-ancestor <hash> HEAD; then
-					//   # Calculate number of commits between <hash> and HEAD
-					//   num_commits=$(git rev-list --count <hash>^..HEAD)
-					//   echo "Commit <hash> is $num_commits commits behind HEAD."
-					// else
-					//   echo "Commit <hash> is not an ancestor of HEAD."
-					// fi
-					// 					*/
-					// 					if (target.hash) {
-
-					// 					}
 					runAction({
 						command: 'rewordCommit',
 						repo: this.currentRepo,
