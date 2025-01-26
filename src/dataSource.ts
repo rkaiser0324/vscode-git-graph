@@ -1035,10 +1035,7 @@ export class DataSource extends Disposable {
 			// Failure
 			this.logger.logCmd('rev-list failed ' + reason, []);
 			return reason;
-		}).then(numCommitsIncludingHead => {
-			// rev-list counts the current commit, so subtract 1
-			const numCommits = numCommitsIncludingHead - 1;
-
+		}).then(numCommits => {
 			// Actually don't quote it per https://stackoverflow.com/questions/12310468/node-js-child-process-issue-with-args-quotes-issue-ffmpeg-issue
 			this.spawnGit([
 				'-c',
