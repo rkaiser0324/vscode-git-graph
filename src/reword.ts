@@ -3,17 +3,36 @@
 /*
 npm install -g ts-node
 
-ts-node src/reword.ts <FilePath>
+ts-node src/reword.ts <FilePath> <action> <count>
 
 */
 
 import * as fs from 'fs';
 
 const filePath = process.argv[2];
+const action = process.argv[3];
+const countArg = process.argv[4];
 
 if (!filePath) {
-	console.error('Usage: node script.ts <FilePath>');
+	console.error('Usage: node script.ts <FilePath> <action> [count]');
 	process.exit(1);
+}
+
+let count: number;
+
+if (action === 'combine') {
+	if (!countArg) {
+		console.error('Count not specified.');
+		process.exit(1);
+	}
+
+	const countNumber = parseInt(countArg, 10);
+	if (isNaN(countNumber) || countNumber < 2) {
+		console.error('Invalid count. Count must be an integer greater than 1.');
+		process.exit(1);
+	}
+	count = countNumber;
+
 }
 
 fs.readFile(filePath, 'utf8', (err, data) => {
@@ -22,7 +41,21 @@ fs.readFile(filePath, 'utf8', (err, data) => {
 		process.exit(1);
 	}
 
-	const newData = data.replace(/pick/g, 'reword');
+	let newData;
+	if (action === 'reword') {
+		newData = data.replace(/pick/g, 'reword');
+	} else {
+		const lines = data.split('\n').reverse();
+		newData = lines.map((line, index) => {
+			if (index === 0 || index >= count) {
+				return line;
+			} else {
+				return line.replace(/pick/g, 'squash');
+			}
+		}).join('\n');
+	}
+
+	console.log(newData);
 
 	fs.writeFile(filePath, newData, 'utf8', (err) => {
 		if (err) {
@@ -30,6 +63,6 @@ fs.readFile(filePath, 'utf8', (err, data) => {
 			process.exit(1);
 		}
 
-		console.log(`Successfully replaced "pick" with "reword" in ${filePath}`);
+		console.log(`Successfully modified file: ${filePath}`);
 	});
 });
