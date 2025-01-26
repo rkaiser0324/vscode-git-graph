@@ -14,19 +14,20 @@ Main improvements:
 
 ## Developmentt
 
-To compile:
+Compile automatically:
 ```bash
+# all the frontend and backend code
 npm run watch
-# or a file
+# or a single file
 npm run watch src/rebase.ts
 ```
 
 Per [Contributing](CONTRIBUTING.md):
-1. npm run compile-web-debug
-1. <kbd>F5</kbd> to launch the Extension Development Host in a new window
+1. `npm run compile-web-debug`
+1. <kbd>F5</kbd> to run `npm run compile-src` and launch the Extension Development Host in a new window
 1. Open a folder containing a git repo
 1. Open the Git Graph tab
-1. Open the Output window on the bottom, select "Git Graph" to see log messages
+1. Open the Output window on the bottom, and select "Git Graph" to see log messages
 
 ## Features
 
@@ -43,6 +44,7 @@ Per [Contributing](CONTRIBUTING.md):
         * Apply, Create Branch From, Drop & Pop Stashes
         * View annotated tag details (name, email, date and message)
         * Copy commit hashes, and branch, stash & tag names to the clipboard
+        * Reword the message for a commit
     * View commit details and file changes by clicking on a commit. On the Commit Details View you can:
         * View the Visual Studio Code Diff of any file change by clicking on it.
         * Open the current version of any file that was affected in the commit.

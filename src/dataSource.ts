@@ -989,10 +989,11 @@ export class DataSource extends Disposable {
 				// @ts-ignore-next-line
 
 		// TODO ************ this doesn't work for the compiled JS
-		// const path = require('path');
+		const path = require('path');
 
-		// const currentFilePath = __filename;
-		// const currentDirectoryPath = path.dirname(currentFilePath);
+		const currentFilePath = __filename;
+		const currentDirectoryPath = path.dirname(currentFilePath).replace(/\\/g, '/');
+		// this.logger.logCmd('path: ' + currentDirectoryPath, []);
 		/*
 		function getCommitDistanceFromHead(commitHash:string):number {
 			let count = -1;
@@ -1013,6 +1014,9 @@ export class DataSource extends Disposable {
 
 		/*
 		 git -c "sequence.editor=ts-node H:/shared/digipowers/vscode-git-graph/src/rebase.ts --action reword --n 2" -c "core.editor=code --wait" rebase -i HEAD~2
+
+
+		 node h:/shared/digipowers/vscode-git-graph/out/rebase.mjs --action reword --n 2
 
 		this.logger.logCmd('hash=' + commitHash, []);
 */
@@ -1040,7 +1044,7 @@ export class DataSource extends Disposable {
 			this.spawnGit([
 				'-c',
 				// eslint-disable-next-line
-					"sequence.editor=ts-node H:/shared/digipowers/vscode-git-graph/src/rebase.ts --action reword --n " + numCommits,
+					`sequence.editor=node ${currentDirectoryPath}/rebase.js --action reword --n ` + numCommits,
 				'-c',
 				// eslint-disable-next-line
 					"core.editor=code --wait",
@@ -1053,7 +1057,7 @@ export class DataSource extends Disposable {
 			}).then((subject) => {
 				return subject;
 			}, (reason) => {
-				// Failure
+				// Failure TODO
 				this.logger.logCmd('rebase cmd failed ' + reason, []);
 				return reason;
 			});
