@@ -25,6 +25,8 @@ Per [Contributing](CONTRIBUTING.md):
 1. npm run compile-web-debug
 1. <kbd>F5</kbd> to launch the Extension Development Host in a new window
 1. Open a folder containing a git repo
+1. Open the Git Graph tab
+1. Open the Output window on the bottom, select "Git Graph" to see log messages
 
 ## Features
 

@@ -1011,7 +1011,7 @@ export class DataSource extends Disposable {
 */
 
 
-		this.logger.logCmd(commitHash, []);
+		this.logger.logCmd('hash=' + commitHash, []);
 
 		return this.spawnGit([
 			'merge-base',
@@ -1033,14 +1033,14 @@ export class DataSource extends Disposable {
 			this.spawnGit([
 				'-c',
 				// eslint-disable-next-line
-						"sequence.editor=ts-node H:/shared/digipowers/vscode-git-graph/src/rebase.ts --action reword --n " + numCommits,
+					"sequence.editor=ts-node H:/shared/digipowers/vscode-git-graph/src/rebase.ts --action reword --n " + numCommits,
 				'-c',
 				// eslint-disable-next-line
-						"core.editor=code --wait",
+					"core.editor=code --wait",
 				'rebase',
 				'-i',
 				'HEAD~' + numCommits
-							 ], repo, (stdout) => {
+			], repo, (stdout) => {
 				if (stdout !== '')
 					return stdout; // .trim().replace(/\s+/g, ' ');
 			}).then((subject) => {
@@ -2035,7 +2035,7 @@ export class DataSource extends Disposable {
 				cwd: repo,
 				env: Object.assign({}, process.env, this.askpassEnv)
 			})).then((values) => {
-				if (values[2].match(/code/)) {
+				if (values[2].match(/(code|ancestor)/)) {
 					debugger;
 				}
 				const status = values[0], stdout = values[1], stderr = values[2];
