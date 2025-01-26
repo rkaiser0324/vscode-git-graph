@@ -14,11 +14,9 @@ Main improvements:
 
 ## Install
 
-<ctrl> <shift> P
-
-disable git graph extension on Extension Development Host window and reload
-
-open a folder with a Git repo
+1. Get to the command pallet: <kbd>ctrl</kbd> <kbd>shift</kbd> <kbd>P</kbd>
+1. Disable Git Graph extension on the Extension Development Host window and reload
+1. Open a folder containing a git repo
 
 ## Features
 
