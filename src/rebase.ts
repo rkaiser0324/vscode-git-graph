@@ -1,10 +1,6 @@
 /* eslint-disable no-console */
 
-/*
-npm install -g ts-node
-
-*/
-
+// ts-node used for development only
 function usage() {
 	console.error('Usage: ts-node rebase.ts --action <reword|combine> --n <num-commits-back|hash> [--c <count-to-combine>] <git-rebase-todo-filename>\n');
 	exit(1);
@@ -99,6 +95,8 @@ if (!options.filename) {
 	usage();
 }
 
+// This is re-implemented in dataSource.ts, since the hash option isn't used in practice;
+// we require numCommits anyway for the HEAD~n argument
 function getCommitDistanceFromHead(commitHash:string):number {
 	let count = -1;
 
@@ -140,11 +138,6 @@ function getLatestCommits(count: number):Promise<{hash: string, shortMessage: st
 
 getLatestCommits(numCommitsBack)
 	.then(commits => {
-		// if (action === 'reword') {
-		// 	console.log('rewording commits');
-		// } else console.log(`combining ${count} commits`);
-		// console.log(commits);
-
 		let newData = '';
 		commits.reverse().forEach((c, i) => {
 			let commitAction = 'pick';
@@ -178,42 +171,6 @@ getLatestCommits(numCommitsBack)
 	.catch(error => {
 		console.error('Error constructing the rebase file:', error);
 	});
-
-
-/* tiblib$123
-fs.readFile(options.filename, 'utf8', (err: any, data: string) => {
-	if (err) {
-		console.error(`Error reading file: ${err}`);
-		exit(1);
-	}
-
-	let newData;
-	if (action === 'reword') {
-		newData = data.replace(/pick/g, 'reword');
-	} else {
-		const lines = data.split('\n').reverse();
-		newData = lines.map((line, index) => {
-			if (index === 0 || index >= count) {
-				return line;
-			} else {
-				return line.replace(/pick/g, 'squash');
-			}
-		}).join('\n');
-	}
-
-	console.log(newData);
-
-	fs.writeFile(filePath, newData, 'utf8', (err) => {
-		if (err) {
-			console.error(`Error writing file: ${err}`);
-			exit(1);
-		}
-
-		console.log(`Successfully modified file: ${filePath}`);
-	});
-});
-
-*/
 
 function ellipsis(str:string, maxLength = 50) {
 	if (str.length <= maxLength) {
