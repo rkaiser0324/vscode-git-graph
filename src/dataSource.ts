@@ -988,6 +988,11 @@ export class DataSource extends Disposable {
 		// eslint-disable-next-line
 				// @ts-ignore-next-line
 
+		// TODO ************ this doesn't work for the compiled JS
+		// const path = require('path');
+
+		// const currentFilePath = __filename;
+		// const currentDirectoryPath = path.dirname(currentFilePath);
 
 		// Actually don't quote it per https://stackoverflow.com/questions/12310468/node-js-child-process-issue-with-args-quotes-issue-ffmpeg-issue
 			 let status = this.spawnGit([
