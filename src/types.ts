@@ -683,6 +683,15 @@ export interface ResponseCleanUntrackedFiles extends ResponseWithErrorInfo {
 	readonly command: 'cleanUntrackedFiles';
 }
 
+export interface RequestCombineCommits extends RepoRequest {
+	readonly command: 'combineCommits';
+	readonly firstCommit: number;
+	readonly numCommits: number;
+}
+export interface ResponseCombineCommits extends ResponseWithErrorInfo {
+	readonly command: 'combineCommits';
+}
+
 export interface RequestCommitDetails extends RepoRequest {
 	readonly command: 'commitDetails';
 	readonly commitHash: string;
@@ -1262,6 +1271,7 @@ export type RequestMessage =
 	| RequestCheckoutCommit
 	| RequestCherrypickCommit
 	| RequestCleanUntrackedFiles
+	| RequestCombineCommits
 	| RequestCommitDetails
 	| RequestCompareCommits
 	| RequestCopyFilePath
@@ -1326,6 +1336,7 @@ export type ResponseMessage =
 	| ResponseCheckoutCommit
 	| ResponseCherrypickCommit
 	| ResponseCleanUntrackedFiles
+	| ResponseCombineCommits
 	| ResponseCompareCommits
 	| ResponseCommitDetails
 	| ResponseCopyFilePath

@@ -1246,6 +1246,20 @@ class GitGraphView {
 						runAction({ command: 'dropCommit', repo: this.currentRepo, commitHash: hash }, 'Dropping Commit');
 					}, target);
 				}
+			}, {
+				title: 'Combine Commits' + ELLIPSIS,
+				visible: true, //	visibility.drop && this.graph.dropCommitPossible(this.commitLookup[hash]),
+				onClick: () => {
+					dialog.showConfirmation('Combine text goes here', 'Yes, combine', () => {
+						runAction({
+							command: 'combineCommits',
+							repo: this.currentRepo,
+							numCommits: 3,
+							firstCommit: 1
+							/* commitHash: hash */
+						}, 'Combining Commit');
+					}, target);
+				}
 			}
 		], [
 			{
