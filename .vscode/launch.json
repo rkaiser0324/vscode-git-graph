@@ -13,7 +13,8 @@
 			"sourceMaps": true,
 			"outFiles": [
 				"${workspaceFolder}/out/**/*.js"
-			]
+			],
+			"preLaunchTask": "Compile (Back-End Only)" 
 		}
 	]
 }

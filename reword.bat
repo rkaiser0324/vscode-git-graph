@@ -38,3 +38,5 @@ REM reword with code editor
 git -c sequence.editor="ts-node 'H:\\shared\\digipowers\\vscode-git-graph\\src\\rebase.ts' --action reword --n 3" -c core.editor="code --wait"  rebase -i HEAD~3
 
 git -c sequence.editor="ts-node 'H:\\shared\\digipowers\\vscode-git-graph\\src\\rebase.ts' --action combine --n 3 --c 2" -c core.editor="code --wait"  rebase -i HEAD~3
+
+REM "\"ts-node H:/shared/digipowers/vscode-git-graph/src/rebase.ts --action reword --n 3\": line 1: ts-node H:/shared/digipowers/vscode-git-graph/src/rebase.ts --action reword --n 3: No such file or directory\nerror: There was a problem with the editor '\"ts-node H:/shared/digipowers/vscode-git-graph/src/rebase.ts --action reword --n 3\"'.\n"

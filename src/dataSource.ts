@@ -942,9 +942,12 @@ export class DataSource extends Disposable {
 				return stdout; // .trim().replace(/\s+/g, ' ');
 		}).then((subject) => subject, () => null);
 */
-
+		// eslint-disable-next-line
+				// @ts-ignore-next-line
 		let status = this.spawnGit([
 			'-c sequence.editor="ts-node "H:\\shared\\digipowers\\vscode-git-graph\\src\\rebase.ts"',
+			'-c',
+			'core.editor="code --wait"',
 			'rebase',
 			'-i',
 			'HEAD~3'
@@ -980,8 +983,20 @@ export class DataSource extends Disposable {
 			}).then((subject) => subject, () => null);
 	*/
 
+		// eslint-disable-next-line
+				// @ts-ignore-next-line
+			 let status = this.runGitCommand([
+			'-c',
+			'sequence.editor="ts-node H:/shared/digipowers/vscode-git-graph/src/rebase.ts --action reword --n 3"',
+			'-c',
+			'core.editor="code --wait"',
+			'rebase',
+			'-i',
+			'HEAD~3'
+			 ], repo);
+		/*
 		let status = this.spawnGit([
-			'-c sequence.editor="ts-node "H:\\shared\\digipowers\\vscode-git-graph\\src\\rebase.ts"',
+			'-c sequence.editor="ts-node "H:\\shared\\digipowers\\vscode-git-graph\\src\\rebase.ts" --action reword --n 3',
 			'-c',
 			'core.editor="code --wait"',
 			'rebase',
@@ -991,7 +1006,7 @@ export class DataSource extends Disposable {
 			if (stdout !== '')
 				return stdout; // .trim().replace(/\s+/g, ' ');
 		}).then((subject) => subject, () => null);
-
+*/
 		// let status = this.runGitCommand(['status', '--porcelain=v1', '--untracked-files=no'], repo);
 		// console.log(status);
 
@@ -1945,6 +1960,11 @@ export class DataSource extends Disposable {
 	 * @param ignoreExitCode Ignore the exit code returned by Git (default: `FALSE`).
 	 */
 	private _spawnGit<T>(args: string[], repo: string, resolveValue: { (stdout: Buffer, stderr: string): T }, ignoreExitCode: boolean = false) {
+
+		if (args[4] === 'rebase'
+		) {
+			debugger;
+		}
 		return new Promise<T>((resolve, reject) => {
 			if (this.gitExecutable === null) {
 				return reject(UNABLE_TO_FIND_GIT_MSG);
@@ -1954,6 +1974,9 @@ export class DataSource extends Disposable {
 				cwd: repo,
 				env: Object.assign({}, process.env, this.askpassEnv)
 			})).then((values) => {
+				if (values[2].match(/ts-node/)) {
+					debugger;
+				}
 				const status = values[0], stdout = values[1], stderr = values[2];
 				if (status.code === 0 || ignoreExitCode) {
 					resolve(resolveValue(stdout, stderr));

@@ -263,7 +263,7 @@ export class GitGraphView extends Disposable {
 
 				// eslint-disable-next-line
 					// @ts-ignore-next-line
-				let _data2 = this.dataSource.combineCommits(msg.repo, 1, 3);
+				let _data2 = this.dataSource.rewordCommit(msg.repo, 1, 3);
 				// console.log(_data);
 
 
