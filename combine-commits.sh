@@ -45,21 +45,30 @@ fi
 CURRENT_HASH=$(git log --pretty=format:'%h' -n 1)
 LINE=$(git log --pretty=format:'%h %s' -n 1)
 
-echo "Current commit: $LINE"
-echo "Combining $NUMCOMMITS commits, starting from $FIRSTCOMMIT commits ago"
+echo -e "Current commit: $LINE\n"
+echo -e "Combining $NUMCOMMITS commits, starting from $FIRSTCOMMIT commits ago:\n"
+echo "$(git log -n ${NUMCOMMITS} --skip=$FIRSTCOMMIT --pretty=format:'# %h %<(20)%cn %cd%n%s%n%b' --date=format:'%D %I:%M:%S %p')"
+echo ""
 
-git reset --hard HEAD~${FIRSTCOMMIT}
+read -p "Continue? [Y]: " answer
 
-# Subtract 1 since the first commit is already included
-NUMCOMMITS="$(($NUMCOMMITS - 1))"
+if [[ "$answer" == "" || "$answer" == "Y" || "$answer" == "y" ]]; then
+    git reset --hard HEAD~${FIRSTCOMMIT}
 
-git reset --soft HEAD~${NUMCOMMITS}
+    # Subtract 1 since the first commit is already included
+    NUMCOMMITS="$(($NUMCOMMITS - 1))"
 
-git commit -e -m "$(git log -n ${NUMCOMMITS} --pretty=format:'# %h %<(20)%cn %cd%n%s%n%b' --date=format:'%D %I:%M:%S %p')"
+    git reset --soft HEAD~${NUMCOMMITS}
 
-if [ $? == 1 ]
-then
-    echo "Cancelled out"
-    git reset ${CURRENT_HASH} --hard
-    exit 1;
+    git commit -e -m "$(git log -n ${NUMCOMMITS} --pretty=format:'# %h %<(20)%cn %cd%n%s%n%b' --date=format:'%D %I:%M:%S %p')"
+
+    if [ $? == 1 ]
+    then
+        echo "Cancelled out"
+        git reset ${CURRENT_HASH} --hard
+        exit 1;
+    fi
+else
+    echo "Cancelled - no changes made."
+    exit 1
 fi
