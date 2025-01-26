@@ -6,7 +6,7 @@ npm install -g ts-node
 */
 
 function usage() {
-	console.error('Usage: ts-node rebase.ts --action <reword|combine> --n <num-commits-back> [--c <count-to-combine>] <git-rebase-todo-filename>\n');
+	console.error('Usage: ts-node rebase.ts --action <reword|combine> --n <num-commits-back|hash> [--c <count-to-combine>] <git-rebase-todo-filename>\n');
 	exit(1);
 }
 
@@ -19,7 +19,7 @@ interface Options {
 
 import * as fs from 'fs';
 import { exit } from 'process';
-import { exec } from 'child_process';
+import { exec, execSync } from 'child_process';
 
 // const action = process.argv[2];
 // const numCommitsBackArg = process.argv[3];
@@ -45,7 +45,11 @@ for (let i = 0; i < args.length; i += 2) {
 			options.action = value;
 			break;
 		case '--n':
-			options.numCommitsBack = parseInt(value, 10);
+			if (!Number.isInteger(value)) {
+				options.numCommitsBack = getCommitDistanceFromHead(value);
+			}	else {
+				options.numCommitsBack = parseInt(value, 10);
+			}
 			break;
 		case '--c':
 			options.count = parseInt(value, 10);
@@ -74,7 +78,7 @@ if (action === 'combine') {
 		console.error('Count not specified.');
 		usage();
 	} else if (count < 2) {
-		console.error('Invalid count. Count must be an integer greater than 1.');
+		console.error('Invalid count; it must be 2 or more.');
 		usage();
 	}
 } else if (action !== 'reword') {
@@ -83,14 +87,33 @@ if (action === 'combine') {
 }
 
 if (!numCommitsBack) {
-	console.error('Num commits back not specified.');
+	console.error('Numner of commits back not specified.');
 	usage();
 }
 
 // numCommitsBack = parseInt(numCommitsBackArg, 10);
-if (isNaN(numCommitsBack) || numCommitsBack < 0) {
-	console.error('Invalid numCommitsBack. numCommitsBack must be an integer greater than 0.');
+if (numCommitsBack === -1) {
+	console.error('Invalid hash; it is not on the current branch.');
 	usage();
+}
+if (numCommitsBack < 1) {
+	console.error('Invalid number of commits back; it must be 1 or more.');
+	usage();
+}
+
+function getCommitDistanceFromHead(commitHash:string):number {
+	let count = -1;
+	try {
+		// This throws an error if the commit is not an ancestor
+		execSync(`git merge-base --is-ancestor ${commitHash} HEAD`, { stdio: 'ignore' });
+
+		count = parseInt(execSync(`git rev-list --count ${commitHash}^..HEAD`, { encoding: 'utf8' }).trim());
+
+	} catch (error) {
+		// no-op
+	} finally {
+		return count;
+	}
 }
 
 function getLatestCommits(count: number):Promise<{hash: string, shortMessage: string}[]> {
