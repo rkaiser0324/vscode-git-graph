@@ -688,8 +688,18 @@ export interface RequestCombineCommits extends RepoRequest {
 	readonly firstCommit: number;
 	readonly numCommits: number;
 }
+
 export interface ResponseCombineCommits extends ResponseWithErrorInfo {
 	readonly command: 'combineCommits';
+}
+
+export interface RequestRewordCommit extends RepoRequest {
+	readonly command: 'rewordCommit';
+	readonly firstCommit: number;
+}
+
+export interface ResponseRewordCommit extends ResponseWithErrorInfo {
+	readonly command: 'rewordCommit';
 }
 
 export interface RequestCommitDetails extends RepoRequest {
@@ -1272,6 +1282,7 @@ export type RequestMessage =
 	| RequestCherrypickCommit
 	| RequestCleanUntrackedFiles
 	| RequestCombineCommits
+	| RequestRewordCommit
 	| RequestCommitDetails
 	| RequestCompareCommits
 	| RequestCopyFilePath
@@ -1337,6 +1348,7 @@ export type ResponseMessage =
 	| ResponseCherrypickCommit
 	| ResponseCleanUntrackedFiles
 	| ResponseCombineCommits
+	| ResponseRewordCommit
 	| ResponseCompareCommits
 	| ResponseCommitDetails
 	| ResponseCopyFilePath

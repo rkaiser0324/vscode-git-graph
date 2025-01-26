@@ -959,6 +959,7 @@ class GitGraphView {
 							this.requestCommitComparison(expandedCommit.commitHash, expandedCommit.compareWithHash, true);
 						}
 					} else {
+						// commit comparison closed.
 						this.loadCommitComparison(commitElem, compareWithElem!);
 					}
 				}
@@ -1260,6 +1261,20 @@ class GitGraphView {
 							/* commitHash: hash */
 						}, 'Combining Commit');
 					}, target);
+				}
+			},
+			{
+				title: 'Reword Commit' + ELLIPSIS,
+				visible: true, //	visibility.drop && this.graph.dropCommitPossible(this.commitLookup[hash]),
+				onClick: () => {
+
+					runAction({
+						command: 'rewordCommit',
+						repo: this.currentRepo,
+						firstCommit: 1
+						/* commitHash: hash */
+					}, 'Rewording Commit');
+
 				}
 			}
 		], [
@@ -2305,6 +2320,7 @@ class GitGraphView {
 						if (this.expandedCommit.compareWithHash === commit.hash) {
 							this.closeCommitComparison(true);
 						} else if (this.expandedCommit.commitElem !== null) {
+							// This is where you have a commit open, and then click another one with Ctrl held down
 							this.loadCommitComparison(this.expandedCommit.commitElem, eventElem);
 						}
 					} else {
@@ -3342,6 +3358,10 @@ window.addEventListener('load', () => {
 			case 'combineCommits':
 				debugger;
 				refreshOrDisplayError(msg.error, 'Unable to Combine Commits');
+				break;
+			case 'rewordCommit':
+				debugger;
+				refreshOrDisplayError(msg.error, 'Unable to Reword Commit');
 				break;
 			case 'commitDetails':
 				if (msg.commitDetails !== null) {

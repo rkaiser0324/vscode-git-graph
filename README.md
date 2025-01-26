@@ -16,14 +16,14 @@ Main improvements:
 
 To compile:
 ```bash
-npm run watch [path/to/file]
+npm run watch
 # or a file
 npm run watch src/rebase.ts
 ```
 
-To install:
-1. Get to the command pallet: <kbd>ctrl</kbd> <kbd>shift</kbd> <kbd>P</kbd>
-1. Disable Git Graph extension on the Extension Development Host window and reload
+Per [Contributing](CONTRIBUTING.md):
+1. npm run compile-web-debug
+1. <kbd>F5</kbd> to launch the Extension Development Host in a new window
 1. Open a folder containing a git repo
 
 ## Features

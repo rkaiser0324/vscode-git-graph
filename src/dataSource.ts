@@ -936,10 +936,21 @@ export class DataSource extends Disposable {
 	public combineCommits(repo: string, _firstCommit: number, _numCommits: number) {
 
 		// Check for clean tree
-
+		/*
 		let status = this.spawnGit(['status', '--porcelain=v1', '--untracked-files=no'], repo, (stdout) => {
 			if (stdout !== '')
-			return stdout; // .trim().replace(/\s+/g, ' ');
+				return stdout; // .trim().replace(/\s+/g, ' ');
+		}).then((subject) => subject, () => null);
+*/
+
+		let status = this.spawnGit([
+			'-c sequence.editor="ts-node "H:\\shared\\digipowers\\vscode-git-graph\\src\\rebase.ts"',
+			'rebase',
+			'-i',
+			'HEAD~3'
+		], repo, (stdout) => {
+			if (stdout !== '')
+				return stdout; // .trim().replace(/\s+/g, ' ');
 		}).then((subject) => subject, () => null);
 
 		// let status = this.runGitCommand(['status', '--porcelain=v1', '--untracked-files=no'], repo);
@@ -951,7 +962,45 @@ export class DataSource extends Disposable {
 
 		return status;
 	}
-	
+
+	/**
+	 * Reword the message of a commit.
+	 *
+	 * @param repo The path of the repository.
+	 * @param firstCommit
+	 * @returns The ErrorInfo from the executed command.
+	 */
+	public rewordCommit(repo: string, _firstCommit: number, _numCommits: number) {
+
+		// Check for clean tree
+		/*
+			let status = this.spawnGit(['status', '--porcelain=v1', '--untracked-files=no'], repo, (stdout) => {
+				if (stdout !== '')
+					return stdout; // .trim().replace(/\s+/g, ' ');
+			}).then((subject) => subject, () => null);
+	*/
+
+		let status = this.spawnGit([
+			'-c sequence.editor="ts-node "H:\\shared\\digipowers\\vscode-git-graph\\src\\rebase.ts"',
+			'-c',
+			'core.editor="code --wait"',
+			'rebase',
+			'-i',
+			'HEAD~3'
+		], repo, (stdout) => {
+			if (stdout !== '')
+				return stdout; // .trim().replace(/\s+/g, ' ');
+		}).then((subject) => subject, () => null);
+
+		// let status = this.runGitCommand(['status', '--porcelain=v1', '--untracked-files=no'], repo);
+		// console.log(status);
+
+		// let args = ['checkout'];
+		// if (remoteBranch === null) args.push(branchName);
+		// else args.push('-b', branchName, remoteBranch);
+
+		return status;
+	}
 
 	/**
 	 * Delete a branch in a repository.
