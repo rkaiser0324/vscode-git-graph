@@ -14,13 +14,13 @@ if (!commitHash) {
 	usage();
 }
 
-function checkCommitDistance(commitHash:string): Promise<{ isAncestor: boolean, distance?: number }> {
+function commitDistanceFromHead(commitHash:string): Promise<{ distance: number }> {
 	return new Promise((resolve, reject) => {
 		exec(`git merge-base --is-ancestor ${commitHash} HEAD`, (error, _stdout, _stderr) => {
 			if (error) {
 				debugger;
 				if (error.message) { // .code === 1) {
-					resolve({ isAncestor: false });
+					resolve({ distance: -1 });
 				} else {
 					reject(new Error(`Error executing git merge-base: ${error.message}`));
 				}
@@ -29,7 +29,7 @@ function checkCommitDistance(commitHash:string): Promise<{ isAncestor: boolean, 
 					if (err) {
 						reject(new Error(`Error executing git rev-list: ${err.message}`));
 					} else {
-						resolve({ isAncestor: true, distance: parseInt(count.trim()) });
+						resolve({ distance: parseInt(count.trim()) });
 					}
 				});
 			}
@@ -37,13 +37,14 @@ function checkCommitDistance(commitHash:string): Promise<{ isAncestor: boolean, 
 	});
 }
 
-checkCommitDistance(commitHash)
+commitDistanceFromHead(commitHash)
 	.then(result => {
-		if (result.isAncestor) {
+		if (result.distance) {
 			console.log(`Commit ${commitHash} is ${result.distance} commits behind HEAD.`);
 		} else {
 			console.log(`Commit ${commitHash} is not an ancestor of HEAD.`);
 		}
+		return result.distance;
 	})
 	.catch(error => {
 		console.error(error);
