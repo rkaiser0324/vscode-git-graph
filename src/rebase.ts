@@ -3,23 +3,86 @@
 /*
 npm install -g ts-node
 
-ts-node src/rebase.ts <action=reword|combine> <num-commits-back> [count-to-combine]
-
 */
+
+function usage() {
+	console.error('Usage: ts-node rebase.ts --action <reword|combine> --n <num-commits-back> [--c <count-to-combine>]\n');
+	exit(1);
+}
+
+interface Options {
+	action: string;
+	numCommitsBack: number;
+	count?: number;
+  }
 
 // import * as fs from 'fs';
 import { exit } from 'process';
 import { exec } from 'child_process';
 
-const action = process.argv[2];
-const numCommitsBackArg = process.argv[3];
-const countArg = process.argv[4];
+// const action = process.argv[2];
+// const numCommitsBackArg = process.argv[3];
+// const countArg = process.argv[4];
 
 console.log(process.argv);
 
+// Parse command-line arguments
+const args = process.argv.slice(2);
+const options: Options = {
+	action: '',
+	numCommitsBack: 0
+};
+
+for (let i = 0; i < args.length; i += 2) {
+	const key = args[i];
+	const value = args[i + 1];
+
+	switch (key) {
+		case '--action':
+			options.action = value;
+			break;
+		case '--n':
+			options.numCommitsBack = parseInt(value, 10);
+			break;
+		case '--c':
+			options.count = parseInt(value, 10);
+			break;
+		default:
+			console.error(`Unknown option: ${key}`);
+			process.exit(1);
+	}
+}
+
+const action = options.action;
+const numCommitsBack = options.numCommitsBack;
+const count = options.count;
+
 if (!action) {
-	console.error('Usage: ts-node rebase.ts <action=reword|combine> <num-commits-back> [count-to-combine]');
-	exit(1);
+	usage();
+}
+
+if (action === 'combine') {
+	if (!count) {
+		console.error('Count not specified.');
+		usage();
+	} else if (count < 2) {
+		console.error('Invalid count. Count must be an integer greater than 1.');
+		usage();
+	}
+} else if (action !== 'reword') {
+	console.error('Invalid action.');
+	usage();
+}
+
+if (!numCommitsBack) {
+	console.error('Num commits back not specified.');
+	usage();
+}
+
+// numCommitsBack = parseInt(numCommitsBackArg, 10);
+if (isNaN(numCommitsBack) || numCommitsBack < 0) {
+	console.error('Invalid numCommitsBack. numCommitsBack must be an integer greater than 0.');
+	usage();
 }
 
 function getLatestCommits(count: number):Promise<{hash: string, shortMessage: string, fullMessage: string}[]> {
@@ -47,40 +110,6 @@ function getLatestCommits(count: number):Promise<{hash: string, shortMessage: st
 	});
 }
 
-let count: number;
-
-if (action === 'combine') {
-	if (!countArg) {
-		console.error('Count not specified.');
-		exit(1);
-	}
-
-	const countNumber = parseInt(countArg, 10);
-	if (isNaN(countNumber) || countNumber < 2) {
-		console.error('Invalid count. Count must be an integer greater than 1.');
-		exit(1);
-	}
-	count = countNumber;
-
-} else if (action !== 'reword') {
-	console.error('Invalid action.');
-	exit(1);
-}
-
-let numCommitsBack: number;
-
-if (!numCommitsBackArg) {
-	console.error('Num commits back not specified.');
-	exit(1);
-}
-
-numCommitsBack = parseInt(numCommitsBackArg, 10);
-if (isNaN(numCommitsBack) || numCommitsBack < 0) {
-	console.error('Invalid numCommitsBack. numCommitsBack must be an integer greater than 0.');
-	exit(1);
-}
-
-
 getLatestCommits(numCommitsBack)
 	.then(commits => {
 		if (action === 'reword') {
@@ -98,7 +127,7 @@ getLatestCommits(numCommitsBack)
 				}
 			} else {
 				// console.log(`combining ${count} commits`);
-				if (i > 0 && i < count) {
+				if (count && i > 0 && i < count) {
 					commitAction = 's   ';
 				}
 			}
@@ -143,3 +172,4 @@ fs.readFile(filePath, 'utf8', (err, data) => {
 	});
 });
 */
+
