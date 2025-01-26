@@ -51,7 +51,7 @@ for (let i = 0; i < args.length; i += 2) {
 			options.count = parseInt(value, 10);
 			break;
 		default:
-			if (i == args.length - 1 && !value) {
+			if (i === args.length - 1 && !value) {
 				// This is the filename of git-rebase-todo
 				options.filename = key;
 			} else {
@@ -93,9 +93,9 @@ if (isNaN(numCommitsBack) || numCommitsBack < 0) {
 	usage();
 }
 
-function getLatestCommits(count: number):Promise<{hash: string, shortMessage: string, fullMessage: string}[]> {
+function getLatestCommits(count: number):Promise<{hash: string, shortMessage: string}[]> {
 	return new Promise((resolve, reject) => {
-		exec(`git log -n ${count} --format="%h %s%n%b"`, (error, stdout, stderr) => {
+		exec(`git log -n ${count} --format="%h %s"`, (error, stdout, stderr) => {
 			if (error) {
 				reject(error);
 				return;
@@ -105,12 +105,11 @@ function getLatestCommits(count: number):Promise<{hash: string, shortMessage: st
 				return;
 			}
 
-			const commits = stdout.trim().split('\n\n').map(commit => {
+			const commits = stdout.trim().split('\n').map(commit => {
 				const lines = commit.split('\n');
 				const hash = lines[0].split(' ')[0];
 				const shortMessage = lines[0].substring(lines[0].indexOf(' ') + 1);
-				const fullMessage = lines.slice(1).join('\n');
-				return { hash, shortMessage, fullMessage };
+				return { hash, shortMessage};
 			});
 
 			resolve(commits);
@@ -123,10 +122,10 @@ getLatestCommits(numCommitsBack)
 		if (action === 'reword') {
 			console.log('rewording commits');
 		} else console.log(`combining ${count} commits`);
+		 console.log(commits);
 
 		let newData = '';
-		let reversed = commits.reverse();
-		reversed.forEach((c, i) => {
+		commits.reverse().forEach((c, i) => {
 			let commitAction = 'pick';
 
 			if (action === 'reword') {
@@ -140,7 +139,8 @@ getLatestCommits(numCommitsBack)
 					commitAction = 's   ';
 				}
 			}
-			let line = `${commitAction} ${c.hash} ${c.shortMessage}`;
+			// The message is included just to aid in debugging, it's not used by git.
+			let line = `${commitAction} ${c.hash} ${ellipsis(c.shortMessage)}`;
 			newData += line + '\n';
 			console.log(line);
 
@@ -194,3 +194,11 @@ fs.readFile(options.filename, 'utf8', (err: any, data: string) => {
 });
 
 */
+
+function ellipsis(str:string, maxLength = 50) {
+	if (str.length <= maxLength) {
+	  return str;
+	} else {
+	  return str.substring(0, maxLength - 3) + '...';
+	}
+}
