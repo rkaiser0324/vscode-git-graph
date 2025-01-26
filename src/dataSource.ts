@@ -943,7 +943,7 @@ export class DataSource extends Disposable {
 		}).then((subject) => subject, () => null);
 */
 		// eslint-disable-next-line
-				// @ts-ignore-next-line
+		// @ts-ignore-next-line
 		let status = this.spawnGit([
 			'-c sequence.editor="ts-node "H:\\shared\\digipowers\\vscode-git-graph\\src\\rebase.ts"',
 			'-c',
@@ -975,121 +975,57 @@ export class DataSource extends Disposable {
 	 */
 	public async rewordCommit(repo: string, commitHash: string) {
 
-		// Check for clean tree
-		/*
-			let status = this.spawnGit(['status', '--porcelain=v1', '--untracked-files=no'], repo, (stdout) => {
-				if (stdout !== '')
-					return stdout; // .trim().replace(/\s+/g, ' ');
-			}).then((subject) => subject, () => null);
-	*/
+		let currentBranch = await this.spawnGit(['branch', '--show-current'], repo, (stdout) => {
+			return stdout.trim(); // /.replace(/\s+/g, ' ');
+		});
+		if (!currentBranch) return ('No current branch' + commitHash);
 
-		const path = require('path');
-
-		const currentFilePath = __filename;
-		const currentDirectoryPath = path.dirname(currentFilePath).replace(/\\/g, '/');
-
-		// Modified from getCommitDistanceFromHead
-		/*
-		let currentBranch = await this.runGitCommand(['branch', '--show-current'], repo);
-		if (!currentBranch) {
-			return 'No current branch';
-		}
-
-		let branches = await this.runGitCommand([
+		let inCurrentBranch = await this.spawnGit([
 			'branch',
 			'--format=%(refname:short)',
 			'--contains',
 			commitHash
-			 ], repo);
+		], repo, stdout => {
+			return stdout.trim().split(/\r\n|\r|\n/).includes(currentBranch);
+		});
+		if (!inCurrentBranch) return `Commit is not in the current branch "${currentBranch}".`;
 
-			 let inCurrentBranch = branches ? branches.split(/\r\n|\r|\n/).includes(currentBranch) : false;
-			 if (!inCurrentBranch)
-			return 'Not in current branch';
-*/
-
-		try {
-
-
-			let s = this.spawnGit(['branch', '--show-current'], repo, (stdout) => {
-
-				return stdout.trim(); // /.replace(/\s+/g, ' ');
-			}).then((currentBranch) => {
-				if (!currentBranch) throw Error('No current branch');
-
-				return this.spawnGit([
-					'branch',
-					'--format=%(refname:short)',
-					'--contains',
-					commitHash
-				 ], repo, (response) => {
-
-					let inCurrentBranch = response.trim().split(/\r\n|\r|\n/).includes(currentBranch);
-					if (!inCurrentBranch) throw Error('not in current branch');
-
-					return this.spawnGit([
-						'rev-list',
-						'--count',
-						commitHash + '^..HEAD'
-					], repo, (stdout) => {
-						return stdout.trim(); // /.replace(/\s+/g, ' ');
-					}).then(numCommits => {
-					// Actually don't quote it per https://stackoverflow.com/questions/12310468/node-js-child-process-issue-with-args-quotes-issue-ffmpeg-issue
-						return this.spawnGit([
-							'-c',
-							// eslint-disable-next-line
-								`sequence.editor=node ${currentDirectoryPath}/rebase.js --action reword --n ` + numCommits,
-							'-c',
-							// eslint-disable-next-line
-								"core.editor=code --wait",
-							'rebase',
-							'-i',
-							'HEAD~' + numCommits
-						], repo, (stdout) => {
-						// if (stdout !== '')
-							return stdout; // .trim().replace(/\s+/g, ' ');
-						}).then((subject) => {
-							if (subject.match(/Successfully modified file/))
-								return null;
-							return subject;
-						}, (reason:string) => {
-						// Failure TODO
-							this.logger.logCmd('rebase cmd failed ' + reason, []);
-							return reason;
-						});
-					}, () => null);
-				});
-
-			}, (error) => {
-				return 'msg' + error;
-			});
-
-			return s;
-		} catch (e) {
-			return e;
-		}
-
-
-		/*
-		let status = this.spawnGit([
-			'-c sequence.editor="ts-node "H:\\shared\\digipowers\\vscode-git-graph\\src\\rebase.ts" --action reword --n 3',
-			'-c',
-			'core.editor="code --wait"',
-			'rebase',
-			'-i',
-			'HEAD~3'
+		return this.spawnGit([
+			'rev-list',
+			'--count',
+			commitHash + '^..HEAD'
 		], repo, (stdout) => {
-			if (stdout !== '')
+			return stdout.trim(); // /.replace(/\s+/g, ' ');
+		}).then(numCommits => {
+
+			const path = require('path');
+			const currentFilePath = __filename;
+			const currentDirectoryPath = path.dirname(currentFilePath).replace(/\\/g, '/');
+
+			// Actually don't quote it per https://stackoverflow.com/questions/12310468/node-js-child-process-issue-with-args-quotes-issue-ffmpeg-issue
+			return this.spawnGit([
+				'-c',
+				// eslint-disable-next-line
+				`sequence.editor=node ${currentDirectoryPath}/rebase.js --action reword --n ` + numCommits,
+				'-c',
+				// eslint-disable-next-line
+				"core.editor=code --wait",
+				'rebase',
+				'-i',
+				'HEAD~' + numCommits
+			], repo, (stdout) => {
+				// if (stdout !== '')
 				return stdout; // .trim().replace(/\s+/g, ' ');
-		}).then((subject) => subject, () => null);
-*/
-		// let status = this.runGitCommand(['status', '--porcelain=v1', '--untracked-files=no'], repo);
-		// console.log(status);
-
-		// let args = ['checkout'];
-		// if (remoteBranch === null) args.push(branchName);
-		// else args.push('-b', branchName, remoteBranch);
-
-		// return status;
+			}).then((subject) => {
+				if (subject.match(/Successfully modified file/))
+					return null;
+				return subject;
+			}, (reason: string) => {
+				// Failure TODO
+				this.logger.logCmd('rebase cmd failed ' + reason, []);
+				return reason;
+			});
+		}, () => null);
 	}
 
 	/**
