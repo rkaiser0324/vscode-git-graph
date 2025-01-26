@@ -10,6 +10,10 @@ usage() {
   exit 1
 }
 
+# Define color codes
+red='\033[0;31m'
+reset='\033[0m'
+
 FIRSTCOMMIT=0
 
 while getopts ":s:n:" opt; do
@@ -44,31 +48,36 @@ fi
 
 CURRENT_HASH=$(git log --pretty=format:'%h' -n 1)
 LINE=$(git log --pretty=format:'%h %s' -n 1)
+COMMIT_MESSAGE="$(git log -n ${NUMCOMMITS} --skip=$FIRSTCOMMIT --pretty=format:'# %h %<(20)%cn %cd%n%s%n%b' --date=format:'%D %I:%M:%S %p')"
 
 echo -e "Current commit: $LINE\n"
 echo -e "Combining $NUMCOMMITS commits, starting from $FIRSTCOMMIT commits ago:\n"
-echo "$(git log -n ${NUMCOMMITS} --skip=$FIRSTCOMMIT --pretty=format:'# %h %<(20)%cn %cd%n%s%n%b' --date=format:'%D %I:%M:%S %p')"
+echo -e "$COMMIT_MESSAGE"
 echo ""
 
 read -p "Continue? [Y]: " answer
 
 if [[ "$answer" == "" || "$answer" == "Y" || "$answer" == "y" ]]; then
-    git reset --hard HEAD~${FIRSTCOMMIT}
+
+    # Suppress output via > /dev/null 2>&1
+    git reset --hard HEAD~${FIRSTCOMMIT} 
 
     # Subtract 1 since the first commit is already included
     NUMCOMMITS="$(($NUMCOMMITS - 1))"
 
     git reset --soft HEAD~${NUMCOMMITS}
 
+    # Abort via ESC, then :cq
     git commit -e -m "$(git log -n ${NUMCOMMITS} --pretty=format:'# %h %<(20)%cn %cd%n%s%n%b' --date=format:'%D %I:%M:%S %p')"
 
     if [ $? == 1 ]
     then
-        echo "Cancelled out"
         git reset ${CURRENT_HASH} --hard
-        exit 1;
+
+        echo -e "${red}Cancelled out - no changes made.${reset}"
+        exit 1
     fi
 else
-    echo "Cancelled - no changes made."
+    echo -e "${red}Cancelled out - no changes made.${reset}"
     exit 1
 fi
