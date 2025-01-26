@@ -983,17 +983,29 @@ export class DataSource extends Disposable {
 			}).then((subject) => subject, () => null);
 	*/
 
+		// '-c sequence.editor="ts-node H:/shared/digipowers/vscode-git-graph/src/rebase.ts --action reword --n 3" -c core.editor="code --wait" rebase -i HEAD~3'
+
 		// eslint-disable-next-line
 				// @ts-ignore-next-line
-			 let status = this.runGitCommand([
+
+
+		// Actually don't quote it per https://stackoverflow.com/questions/12310468/node-js-child-process-issue-with-args-quotes-issue-ffmpeg-issue
+			 let status = this.spawnGit([
 			'-c',
-			'sequence.editor="ts-node H:/shared/digipowers/vscode-git-graph/src/rebase.ts --action reword --n 3"',
+			// eslint-disable-next-line
+			"sequence.editor=ts-node H:/shared/digipowers/vscode-git-graph/src/rebase.ts --action reword --n 3",
 			'-c',
-			'core.editor="code --wait"',
+
+
+			// eslint-disable-next-line
+			"core.editor=code --wait",
 			'rebase',
 			'-i',
 			'HEAD~3'
-			 ], repo);
+				 ], repo, (stdout) => {
+			if (stdout !== '')
+				return stdout; // .trim().replace(/\s+/g, ' ');
+		}).then((subject) => subject, () => null);
 		/*
 		let status = this.spawnGit([
 			'-c sequence.editor="ts-node "H:\\shared\\digipowers\\vscode-git-graph\\src\\rebase.ts" --action reword --n 3',
@@ -1961,9 +1973,11 @@ export class DataSource extends Disposable {
 	 */
 	private _spawnGit<T>(args: string[], repo: string, resolveValue: { (stdout: Buffer, stderr: string): T }, ignoreExitCode: boolean = false) {
 
-		if (args[4] === 'rebase'
-		) {
+		// let shell = false;
+		if (args.join(' ').includes('code --wait')) {
+
 			debugger;
+			// shell = true;
 		}
 		return new Promise<T>((resolve, reject) => {
 			if (this.gitExecutable === null) {
@@ -1974,7 +1988,7 @@ export class DataSource extends Disposable {
 				cwd: repo,
 				env: Object.assign({}, process.env, this.askpassEnv)
 			})).then((values) => {
-				if (values[2].match(/ts-node/)) {
+				if (values[2].match(/code/)) {
 					debugger;
 				}
 				const status = values[0], stdout = values[1], stderr = values[2];

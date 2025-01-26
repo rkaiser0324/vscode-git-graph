@@ -40,3 +40,8 @@ git -c sequence.editor="ts-node 'H:\\shared\\digipowers\\vscode-git-graph\\src\\
 git -c sequence.editor="ts-node 'H:\\shared\\digipowers\\vscode-git-graph\\src\\rebase.ts' --action combine --n 3 --c 2" -c core.editor="code --wait"  rebase -i HEAD~3
 
 REM "\"ts-node H:/shared/digipowers/vscode-git-graph/src/rebase.ts --action reword --n 3\": line 1: ts-node H:/shared/digipowers/vscode-git-graph/src/rebase.ts --action reword --n 3: No such file or directory\nerror: There was a problem with the editor '\"ts-node H:/shared/digipowers/vscode-git-graph/src/rebase.ts --action reword --n 3\"'.\n"
+
+@REM "\"code --wait\": line 1: code --wait: command not found\nerror: There was a problem with the editor '\"code --wait\"'.\nPlease supply the message using either -m or -F option.\n"
+git -c "core.editor='code --wait'" commit
+
+@REM https://stackoverflow.com/questions/48014957/quotes-in-node-js-spawn-arguments
