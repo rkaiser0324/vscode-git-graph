@@ -1250,6 +1250,7 @@ class GitGraphView {
 				title: 'Combine Commits' + ELLIPSIS,
 				visible: true, //	visibility.drop && this.graph.dropCommitPossible(this.commitLookup[hash]),
 				onClick: () => {
+					debugger;
 					dialog.showConfirmation('Combine text goes here', 'Yes, combine', () => {
 						runAction({
 							command: 'combineCommits',
@@ -3339,7 +3340,7 @@ window.addEventListener('load', () => {
 				refreshOrDisplayError(msg.error, 'Unable to Clean Untracked Files');
 				break;
 			case 'combineCommits':
-				debugger
+				debugger;
 				refreshOrDisplayError(msg.error, 'Unable to Combine Commits');
 				break;
 			case 'commitDetails':

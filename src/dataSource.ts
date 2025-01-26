@@ -927,6 +927,33 @@ export class DataSource extends Disposable {
 	}
 
 	/**
+	 * Combine commits in a branch.
+	 * @param repo The path of the repository.
+	 * @param firstCommit
+	 * @param numCommits
+	 * @returns The ErrorInfo from the executed command.
+	 */
+	public combineCommits(repo: string, _firstCommit: number, _numCommits: number) {
+
+		// Check for clean tree
+
+		let status = this.spawnGit(['status', '--porcelain=v1', '--untracked-files=no'], repo, (stdout) => {
+			if (stdout !== '')
+			return stdout; // .trim().replace(/\s+/g, ' ');
+		}).then((subject) => subject, () => null);
+
+		// let status = this.runGitCommand(['status', '--porcelain=v1', '--untracked-files=no'], repo);
+		// console.log(status);
+
+		// let args = ['checkout'];
+		// if (remoteBranch === null) args.push(branchName);
+		// else args.push('-b', branchName, remoteBranch);
+
+		return status;
+	}
+	
+
+	/**
 	 * Delete a branch in a repository.
 	 * @param repo The path of the repository.
 	 * @param branchName The name of the branch.
