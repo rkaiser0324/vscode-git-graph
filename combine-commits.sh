@@ -1,12 +1,18 @@
 #!/bin/bash
-#
-# combine-commits.sh -s<num-commits-from-head> -n<num-commits-to-combine>
 
-OPTSTRING=":s:n:"
+# Function to print usage and exit
+usage() {
+  echo "Combine a number of consecutive commits in a git history, starting from a specified commit index."
+  echo ""
+  echo "Usage: $0 -s <start> -n <num>"
+  echo "  -s <start>  : Number of commits from HEAD to start combining (integer > 0)"
+  echo "  -n <num>    : Number of commits to combine (integer > 1)"
+  exit 1
+}
 
 FIRSTCOMMIT=0
 
-while getopts ${OPTSTRING} opt; do
+while getopts ":s:n:" opt; do
   case ${opt} in
     s)
       #echo "Option -s was triggered. ${OPTARG}"
@@ -18,10 +24,16 @@ while getopts ${OPTSTRING} opt; do
       ;;
     ?)
       echo "Invalid option: -${OPTARG}."
-      exit 1
+      usage
       ;;
   esac
 done
+
+# Check if required options are provided
+if [[ -z "$FIRSTCOMMIT" || -z "$NUMCOMMITS" ]]; then
+  echo "Error: Both -s and -n options are required."
+  usage
+fi
 
 NUM_UNSTAGED_CHANGES=$(git status --porcelain=v1 --untracked-file=no 2>/dev/null | wc -l)
 if [ $NUM_UNSTAGED_CHANGES -ne "0" ]
