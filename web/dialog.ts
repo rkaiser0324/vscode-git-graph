@@ -571,7 +571,7 @@ class CustomSelect {
 				}
 			}
 		} else {
-			const defaultIndex = data.options.findIndex((option) => option.value === data.default);
+			const defaultIndex = data.options.findIndex((option) => option.value === data['default']);
 			this.setItemSelectedState(defaultIndex > -1 ? defaultIndex : 0, true);
 		}
 		this.renderCurrentValue();
