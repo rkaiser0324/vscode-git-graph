@@ -1005,7 +1005,12 @@ export class DataSource extends Disposable {
 				 ], repo, (stdout) => {
 			if (stdout !== '')
 				return stdout; // .trim().replace(/\s+/g, ' ');
-		}).then((subject) => subject, () => null);
+		}).then((subject) => {
+			return subject;
+		}, (reason) => {
+
+			return reason;
+		});
 		/*
 		let status = this.spawnGit([
 			'-c sequence.editor="ts-node "H:\\shared\\digipowers\\vscode-git-graph\\src\\rebase.ts" --action reword --n 3',
@@ -1976,7 +1981,7 @@ export class DataSource extends Disposable {
 		// let shell = false;
 		if (args.join(' ').includes('code --wait')) {
 
-			debugger;
+			// debugger;
 			// shell = true;
 		}
 		return new Promise<T>((resolve, reject) => {

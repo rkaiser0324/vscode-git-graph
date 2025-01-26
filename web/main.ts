@@ -1268,6 +1268,7 @@ class GitGraphView {
 				visible: true, //	visibility.drop && this.graph.dropCommitPossible(this.commitLookup[hash]),
 				onClick: () => {
 
+					debugger;
 					runAction({
 						command: 'rewordCommit',
 						repo: this.currentRepo,
