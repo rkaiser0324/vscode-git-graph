@@ -12,8 +12,16 @@ Main improvements:
 
 ![Additions](https://github.com/hansu/vscode-git-graph/raw/master/resources/demo.gif)
 
-## Install
+## Developmentt
 
+To compile:
+```bash
+npm run watch [path/to/file]
+# or a file
+npm run watch src/rebase.ts
+```
+
+To install:
 1. Get to the command pallet: <kbd>ctrl</kbd> <kbd>shift</kbd> <kbd>P</kbd>
 1. Disable Git Graph extension on the Extension Development Host window and reload
 1. Open a folder containing a git repo

@@ -6,17 +6,18 @@ npm install -g ts-node
 */
 
 function usage() {
-	console.error('Usage: ts-node rebase.ts --action <reword|combine> --n <num-commits-back> [--c <count-to-combine>]\n');
+	console.error('Usage: ts-node rebase.ts --action <reword|combine> --n <num-commits-back> [--c <count-to-combine>] <git-rebase-todo-filename>\n');
 	exit(1);
 }
 
 interface Options {
-	action: string;
-	numCommitsBack: number;
-	count?: number;
+	action: string,
+	numCommitsBack: number,
+	count?: number,
+	filename: string
   }
 
-// import * as fs from 'fs';
+import * as fs from 'fs';
 import { exit } from 'process';
 import { exec } from 'child_process';
 
@@ -30,10 +31,12 @@ console.log(process.argv);
 const args = process.argv.slice(2);
 const options: Options = {
 	action: '',
-	numCommitsBack: 0
+	numCommitsBack: 0,
+	filename: ''
 };
 
 for (let i = 0; i < args.length; i += 2) {
+
 	const key = args[i];
 	const value = args[i + 1];
 
@@ -48,8 +51,13 @@ for (let i = 0; i < args.length; i += 2) {
 			options.count = parseInt(value, 10);
 			break;
 		default:
-			console.error(`Unknown option: ${key}`);
-			process.exit(1);
+			if (i == args.length - 1 && !value) {
+				// This is the filename of git-rebase-todo
+				options.filename = key;
+			} else {
+				console.error(`Unknown option: ${key}`);
+				process.exit(1);
+			}
 	}
 }
 
@@ -116,6 +124,7 @@ getLatestCommits(numCommitsBack)
 			console.log('rewording commits');
 		} else console.log(`combining ${count} commits`);
 
+		let newData = '';
 		let reversed = commits.reverse();
 		reversed.forEach((c, i) => {
 			let commitAction = 'pick';
@@ -131,7 +140,19 @@ getLatestCommits(numCommitsBack)
 					commitAction = 's   ';
 				}
 			}
-			console.log(`${commitAction} ${c.hash} ${c.shortMessage}`);
+			let line = `${commitAction} ${c.hash} ${c.shortMessage}`;
+			newData += line + '\n';
+			console.log(line);
+
+		});
+
+		fs.writeFile(options.filename, newData, 'utf8', (err) => {
+			if (err) {
+				console.error(`Error writing file ${options.filename}: ${err}`);
+				exit(1);
+			}
+
+			console.log(`Successfully modified file: ${options.filename}`);
 		});
 	})
 	.catch(error => {
@@ -140,7 +161,7 @@ getLatestCommits(numCommitsBack)
 
 
 /*
-fs.readFile(filePath, 'utf8', (err, data) => {
+fs.readFile(options.filename, 'utf8', (err: any, data: string) => {
 	if (err) {
 		console.error(`Error reading file: ${err}`);
 		exit(1);
@@ -171,5 +192,5 @@ fs.readFile(filePath, 'utf8', (err, data) => {
 		console.log(`Successfully modified file: ${filePath}`);
 	});
 });
-*/
 
+*/

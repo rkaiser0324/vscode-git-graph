@@ -26,3 +26,9 @@ git -c sequence.editor="code --wait" -c core.editor="code --wait" rebase -i HEAD
 git -c sequence.editor="'H:\\shared\\digipowers\\vscode-git-graph\\reword.bat' testfile combine 2" -c core.editor="code --wait" rebase -i HEAD~3
 
 git -c sequence.editor="ts-node 'H:\\shared\\digipowers\\vscode-git-graph\\src\\reword.ts' testfile combine 2" -c core.editor="code --wait" rebase -i HEAD~3
+
+REM named params, the 3's must match
+git -c sequence.editor="ts-node 'H:\\shared\\digipowers\\vscode-git-graph\\src\\rebase.ts' --action reword --n 3"  rebase -i HEAD~3
+
+REM and combining
+git -c sequence.editor="ts-node 'H:\\shared\\digipowers\\vscode-git-graph\\src\\rebase.ts' --action combine --n 3 --c 2"  rebase -i HEAD~3
