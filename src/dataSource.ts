@@ -975,10 +975,23 @@ export class DataSource extends Disposable {
 	 */
 	public async rewordCommit(repo: string, commitHash: string) {
 
-		let currentBranch = await this.spawnGit(['branch', '--show-current'], repo, (stdout) => {
+		let status = await this.spawnGit(['status'], repo, (stdout) => {
 			return stdout.trim(); // /.replace(/\s+/g, ' ');
 		});
-		if (!currentBranch) return ('No current branch' + commitHash);
+		if (!status) return 'Error in git status';
+		if (status.match(/^interactive rebase in progress/)) {
+			return 'Rebase in progress, abort it first';
+		}
+
+		let currentBranch = '';
+		let matches = status.match(/^On branch (.+)(\r|\n)/);
+		if (matches) {
+			currentBranch = matches[1];
+		}
+		if (!currentBranch) {
+			// git rebase --show-current-patch  => errors if no rebase in progress
+			return 'No current branch';
+		}
 
 		let inCurrentBranch = await this.spawnGit([
 			'branch',
@@ -1017,13 +1030,19 @@ export class DataSource extends Disposable {
 				// if (stdout !== '')
 				return stdout; // .trim().replace(/\s+/g, ' ');
 			}).then((subject) => {
-				if (subject.match(/Successfully modified file/))
+				if (subject.match(/Reword complete:/))
 					return null;
 				return subject;
-			}, (reason: string) => {
-				// Failure TODO
-				this.logger.logCmd('rebase cmd failed ' + reason, []);
-				return reason;
+			}, (stderr: string) => {
+				// This isn't a real error
+				if (stderr.match(/Aborting commit due to empty commit message./)) {
+
+					// Do the abort
+					return this.runGitCommand(['rebase', '--abort'], repo);
+
+				}
+				this.logger.logCmd('rewordCommit failed: ' + stderr, []);
+				return stderr;
 			});
 		}, () => null);
 	}

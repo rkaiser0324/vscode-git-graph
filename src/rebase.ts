@@ -140,10 +140,10 @@ function getLatestCommits(count: number):Promise<{hash: string, shortMessage: st
 
 getLatestCommits(numCommitsBack)
 	.then(commits => {
-		if (action === 'reword') {
-			console.log('rewording commits');
-		} else console.log(`combining ${count} commits`);
-		 console.log(commits);
+		// if (action === 'reword') {
+		// 	console.log('rewording commits');
+		// } else console.log(`combining ${count} commits`);
+		// console.log(commits);
 
 		let newData = '';
 		commits.reverse().forEach((c, i) => {
@@ -163,8 +163,7 @@ getLatestCommits(numCommitsBack)
 			// The message is included just to aid in debugging, it's not used by git.
 			let line = `${commitAction} ${c.hash} ${ellipsis(c.shortMessage)}`;
 			newData += line + '\n';
-			console.log(line);
-
+			// console.log(line);
 		});
 
 		fs.writeFile(options.filename, newData, 'utf8', (err) => {
@@ -173,15 +172,15 @@ getLatestCommits(numCommitsBack)
 				exit(1);
 			}
 
-			console.log(`Successfully modified file: ${options.filename}`);
+			console.log(`Reword complete: ${options.filename}`);
 		});
 	})
 	.catch(error => {
-		console.error('Error fetching commits:', error);
+		console.error('Error constructing the rebase file:', error);
 	});
 
 
-/*
+/* tiblib$123
 fs.readFile(options.filename, 'utf8', (err: any, data: string) => {
 	if (err) {
 		console.error(`Error reading file: ${err}`);
