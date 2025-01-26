@@ -988,48 +988,28 @@ export class DataSource extends Disposable {
 		const currentFilePath = __filename;
 		const currentDirectoryPath = path.dirname(currentFilePath).replace(/\\/g, '/');
 
-		let status = await this.runGitCommand(['rev-list', '--count', commitHash + '^..HEAD'], repo);
-
-		if (status) {
-			let numCommits = status.trim().replace(/\s+/g, ' ');
-
-
-			status = await this.runGitCommand([
-				'-c',
-				// eslint-disable-next-line
-				`sequence.editor=node ${currentDirectoryPath}/rebase.js --action reword --n ` + numCommits,
-				'-c',
-				// eslint-disable-next-line
-				"core.editor=code --wait",
-				'rebase',
-				'-i',
-				'HEAD~' + numCommits], repo);
-		}
-
-		return status;
-		/*
 
 		return this.spawnGit([
 			'rev-list',
 			'--count',
 			commitHash + '^..HEAD'
 				 ], repo, (stdout) => {
-			if (stdout !== '')
-				// Stick everything on one line to make it easier to parse
-				return stdout.trim().replace(/\s+/g, ' ');
+			// if (stdout !== '')
+			// Stick everything on one line to make it easier to parse
+			return stdout.trim().replace(/\s+/g, ' ');
 		}).then((subject) => {
 			// Success
 			if (subject) {
 				this.logger.logCmd(subject, []);
 			}
 			return subject;
-		}, (reason) => {
+		}, (reason:string) => {
 			// Failure
 			this.logger.logCmd('rev-list failed ' + reason, []);
 			return reason;
 		}).then(numCommits => {
 			// Actually don't quote it per https://stackoverflow.com/questions/12310468/node-js-child-process-issue-with-args-quotes-issue-ffmpeg-issue
-			this.spawnGit([
+			return this.spawnGit([
 				'-c',
 				// eslint-disable-next-line
 					`sequence.editor=node ${currentDirectoryPath}/rebase.js --action reword --n ` + numCommits,
@@ -1040,18 +1020,20 @@ export class DataSource extends Disposable {
 				'-i',
 				'HEAD~' + numCommits
 			], repo, (stdout) => {
-				if (stdout !== '')
-					return stdout; // .trim().replace(/\s+/g, ' ');
+				// if (stdout !== '')
+				return stdout; // .trim().replace(/\s+/g, ' ');
 			}).then((subject) => {
+				if (subject.match(/Successfully modified file/))
+					return null;
 				return subject;
-			}, (reason) => {
+			}, (reason:string) => {
 				// Failure TODO
 				this.logger.logCmd('rebase cmd failed ' + reason, []);
 				return reason;
 			});
 		}, () => null);
 
-*/
+
 
 		/*
 		let status = this.spawnGit([
