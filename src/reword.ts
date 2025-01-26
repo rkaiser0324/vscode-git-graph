@@ -1,4 +1,12 @@
 /* eslint-disable no-console */
+
+/*
+npm install -g ts-node
+
+ts-node src/reword.ts <FilePath>
+
+*/
+
 import * as fs from 'fs';
 
 const filePath = process.argv[2];
