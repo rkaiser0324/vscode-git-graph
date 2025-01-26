@@ -3338,6 +3338,10 @@ window.addEventListener('load', () => {
 			case 'cleanUntrackedFiles':
 				refreshOrDisplayError(msg.error, 'Unable to Clean Untracked Files');
 				break;
+			case 'combineCommits':
+				debugger
+				refreshOrDisplayError(msg.error, 'Unable to Combine Commits');
+				break;
 			case 'commitDetails':
 				if (msg.commitDetails !== null) {
 					gitGraph.showCommitDetails(msg.commitDetails, gitGraph.createFileTree(msg.commitDetails.fileChanges, msg.codeReview), msg.avatar, msg.codeReview, msg.codeReview !== null ? msg.codeReview.lastViewedFile : null, msg.refresh);
