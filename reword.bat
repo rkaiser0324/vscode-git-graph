@@ -22,3 +22,7 @@ exit /b 0
 REM this works without using env vars, https://stackoverflow.com/questions/19713861/git-rebase-editor-something-other-than-vim-for-easier-squashing
 REM first editor doesn't have an "abort" button like the second
 git -c sequence.editor="code --wait" -c core.editor="code --wait" rebase -i HEAD~3
+
+git -c sequence.editor="'H:\\shared\\digipowers\\vscode-git-graph\\reword.bat' testfile combine 2" -c core.editor="code --wait" rebase -i HEAD~3
+
+git -c sequence.editor="ts-node 'H:\\shared\\digipowers\\vscode-git-graph\\src\\reword.ts' testfile combine 2" -c core.editor="code --wait" rebase -i HEAD~3

@@ -9,4 +9,6 @@ set "COMMIT_MESSAGE=new message here" & set "GIT_SEQUENCE_EDITOR=powershell.exe 
 
 
 REM also works
-set "GIT_SEQUENCE_EDITOR='H:\\shared\\digipowers\\vscode-git-graph\\reword.bat'" & git rebase -i HEAD~1
+setlocal & set "GIT_SEQUENCE_EDITOR='H:\\shared\\digipowers\\vscode-git-graph\\reword.bat' testfile combine 2" & git rebase -i HEAD~4 & endlocal
+
+@
