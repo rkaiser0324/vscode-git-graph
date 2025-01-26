@@ -989,6 +989,7 @@ export class DataSource extends Disposable {
 		const currentDirectoryPath = path.dirname(currentFilePath).replace(/\\/g, '/');
 
 		// Modified from getCommitDistanceFromHead
+		/*
 		let currentBranch = await this.runGitCommand(['branch', '--show-current'], repo);
 		if (!currentBranch) {
 			return 'No current branch';
@@ -1004,40 +1005,68 @@ export class DataSource extends Disposable {
 			 let inCurrentBranch = branches ? branches.split(/\r\n|\r|\n/).includes(currentBranch) : false;
 			 if (!inCurrentBranch)
 			return 'Not in current branch';
+*/
+
+		try {
 
 
-		return this.spawnGit([
-			'rev-list',
-			'--count',
-			commitHash + '^..HEAD'
-		], repo, (stdout) => {
-			return stdout.trim(); // /.replace(/\s+/g, ' ');
-		}).then(numCommits => {
-			// Actually don't quote it per https://stackoverflow.com/questions/12310468/node-js-child-process-issue-with-args-quotes-issue-ffmpeg-issue
-			return this.spawnGit([
-				'-c',
-				// eslint-disable-next-line
-					`sequence.editor=node ${currentDirectoryPath}/rebase.js --action reword --n ` + numCommits,
-				'-c',
-				// eslint-disable-next-line
-					"core.editor=code --wait",
-				'rebase',
-				'-i',
-				'HEAD~' + numCommits
-			], repo, (stdout) => {
-				// if (stdout !== '')
-				return stdout; // .trim().replace(/\s+/g, ' ');
-			}).then((subject) => {
-				if (subject.match(/Successfully modified file/))
-					return null;
-				return subject;
-			}, (reason:string) => {
-				// Failure TODO
-				this.logger.logCmd('rebase cmd failed ' + reason, []);
-				return reason;
+			let s = this.spawnGit(['branch', '--show-current'], repo, (stdout) => {
+
+				return stdout.trim(); // /.replace(/\s+/g, ' ');
+			}).then((currentBranch) => {
+				if (!currentBranch) throw Error('No current branch');
+
+				return this.spawnGit([
+					'branch',
+					'--format=%(refname:short)',
+					'--contains',
+					commitHash
+				 ], repo, (response) => {
+
+					let inCurrentBranch = response.trim().split(/\r\n|\r|\n/).includes(currentBranch);
+					if (!inCurrentBranch) throw Error('not in current branch');
+
+					return this.spawnGit([
+						'rev-list',
+						'--count',
+						commitHash + '^..HEAD'
+					], repo, (stdout) => {
+						return stdout.trim(); // /.replace(/\s+/g, ' ');
+					}).then(numCommits => {
+					// Actually don't quote it per https://stackoverflow.com/questions/12310468/node-js-child-process-issue-with-args-quotes-issue-ffmpeg-issue
+						return this.spawnGit([
+							'-c',
+							// eslint-disable-next-line
+								`sequence.editor=node ${currentDirectoryPath}/rebase.js --action reword --n ` + numCommits,
+							'-c',
+							// eslint-disable-next-line
+								"core.editor=code --wait",
+							'rebase',
+							'-i',
+							'HEAD~' + numCommits
+						], repo, (stdout) => {
+						// if (stdout !== '')
+							return stdout; // .trim().replace(/\s+/g, ' ');
+						}).then((subject) => {
+							if (subject.match(/Successfully modified file/))
+								return null;
+							return subject;
+						}, (reason:string) => {
+						// Failure TODO
+							this.logger.logCmd('rebase cmd failed ' + reason, []);
+							return reason;
+						});
+					}, () => null);
+				});
+
+			}, (error) => {
+				return 'msg' + error;
 			});
-		}, () => null);
 
+			return s;
+		} catch (e) {
+			return e;
+		}
 
 
 		/*
@@ -2008,11 +2037,11 @@ export class DataSource extends Disposable {
 	private _spawnGit<T>(args: string[], repo: string, resolveValue: { (stdout: Buffer, stderr: string): T }, ignoreExitCode: boolean = false) {
 
 		// let shell = false;
-		if (args.join(' ').includes('code --wait')) {
+		// if (args.join(' ').includes('code --wait')) {
 
-			// debugger;
-			// shell = true;
-		}
+		// 	// debugger;
+		// 	// shell = true;
+		// }
 		return new Promise<T>((resolve, reject) => {
 			if (this.gitExecutable === null) {
 				return reject(UNABLE_TO_FIND_GIT_MSG);
@@ -2022,9 +2051,9 @@ export class DataSource extends Disposable {
 				cwd: repo,
 				env: Object.assign({}, process.env, this.askpassEnv)
 			})).then((values) => {
-				if (values[2].match(/(code|ancestor)/)) {
-					// debugger;
-				}
+				// if (values[2].match(/(code|ancestor)/)) {
+				// 	// debugger;
+				// }
 				const status = values[0], stdout = values[1], stderr = values[2];
 				if (status.code === 0 || ignoreExitCode) {
 					resolve(resolveValue(stdout, stderr));
