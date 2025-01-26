@@ -1011,24 +1011,34 @@ export class DataSource extends Disposable {
 */
 
 
+		/*
+		 git -c "sequence.editor=ts-node H:/shared/digipowers/vscode-git-graph/src/rebase.ts --action reword --n 2" -c "core.editor=code --wait" rebase -i HEAD~2
+
 		this.logger.logCmd('hash=' + commitHash, []);
+*/
 
 		return this.spawnGit([
-			'merge-base',
-			'--is-ancestor',
-			commitHash,
-			'HEAD'
+			'rev-list',
+			'--count',
+			commitHash + '^..HEAD'
 				 ], repo, (stdout) => {
 			if (stdout !== '')
-				return stdout; // .trim().replace(/\s+/g, ' ');
+				// Stick everything on one line to make it easier to parse
+				return stdout.trim().replace(/\s+/g, ' ');
 		}).then((subject) => {
-
-			if (subject) this.logger.logCmd(subject, []);
+			// Success
+			if (subject) {
+				this.logger.logCmd(subject, []);
+			}
 			return subject;
 		}, (reason) => {
-			if (reason) this.logger.logCmd(reason, []);
+			// Failure
+			this.logger.logCmd('rev-list failed ' + reason, []);
 			return reason;
-		}).then(numCommits => {
+		}).then(numCommitsIncludingHead => {
+			// rev-list counts the current commit, so subtract 1
+			const numCommits = numCommitsIncludingHead - 1;
+
 			// Actually don't quote it per https://stackoverflow.com/questions/12310468/node-js-child-process-issue-with-args-quotes-issue-ffmpeg-issue
 			this.spawnGit([
 				'-c',
@@ -1046,7 +1056,8 @@ export class DataSource extends Disposable {
 			}).then((subject) => {
 				return subject;
 			}, (reason) => {
-
+				// Failure
+				this.logger.logCmd('rebase cmd failed ' + reason, []);
 				return reason;
 			});
 		}, () => null);
@@ -2036,7 +2047,7 @@ export class DataSource extends Disposable {
 				env: Object.assign({}, process.env, this.askpassEnv)
 			})).then((values) => {
 				if (values[2].match(/(code|ancestor)/)) {
-					debugger;
+					// debugger;
 				}
 				const status = values[0], stdout = values[1], stderr = values[2];
 				if (status.code === 0 || ignoreExitCode) {

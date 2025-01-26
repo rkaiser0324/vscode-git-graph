@@ -45,11 +45,15 @@ for (let i = 0; i < args.length; i += 2) {
 			options.action = value;
 			break;
 		case '--n':
-			if (!Number.isInteger(value)) {
+			let numOrHash = parseInt(value, 10);
+			if (!numOrHash) {
+
+				 // console.log('not an integer');
 				options.numCommitsBack = getCommitDistanceFromHead(value);
 			}	else {
-				options.numCommitsBack = parseInt(value, 10);
+				options.numCommitsBack = numOrHash;
 			}
+			// exit(1);
 			break;
 		case '--c':
 			options.count = parseInt(value, 10);
@@ -105,11 +109,15 @@ function getCommitDistanceFromHead(commitHash:string):number {
 	let count = -1;
 	try {
 		// This throws an error if the commit is not an ancestor
-		execSync(`git merge-base --is-ancestor ${commitHash} HEAD`, { stdio: 'ignore' });
+		// execSync(`git merge-base --is-ancestor ${commitHash} HEAD`, { stdio: 'ignore' });
 
-		count = parseInt(execSync(`git rev-list --count ${commitHash}^..HEAD`, { encoding: 'utf8' }).trim());
+		let response = execSync(`git rev-list --count ${commitHash}^..HEAD`, { encoding: 'utf8' }).trim();
+		console.log(response);
+		count = parseInt(response, 10);
 
 	} catch (error) {
+		console.log(error);
+		exit(-23);
 		// no-op
 	} finally {
 		return count;
