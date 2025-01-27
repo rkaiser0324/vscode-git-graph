@@ -685,8 +685,8 @@ export interface ResponseCleanUntrackedFiles extends ResponseWithErrorInfo {
 
 export interface RequestCombineCommits extends RepoRequest {
 	readonly command: 'combineCommits';
-	readonly firstCommit: number;
-	readonly numCommits: number;
+	readonly commitHash: string;
+	readonly compareWithHash: string;
 }
 
 export interface ResponseCombineCommits extends ResponseWithErrorInfo {

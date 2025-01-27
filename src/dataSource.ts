@@ -929,52 +929,84 @@ export class DataSource extends Disposable {
 	/**
 	 * Combine commits in a branch.
 	 * @param repo The path of the repository.
-	 * @param firstCommit
-	 * @param numCommits
+	 * @param string commitHash
+	 * @param string compareWithHash
 	 * @returns The ErrorInfo from the executed command.
 	 */
-	public combineCommits(repo: string, _firstCommit: number, _numCommits: number) {
+	public async combineCommits(repo: string, commitHash: string, compareWithHash: string) {
 
-		// Check for clean tree
-		/*
-		let status = this.spawnGit(['status', '--porcelain=v1', '--untracked-files=no'], repo, (stdout) => {
-			if (stdout !== '')
-				return stdout; // .trim().replace(/\s+/g, ' ');
-		}).then((subject) => subject, () => null);
-*/
-		// eslint-disable-next-line
-		// @ts-ignore-next-line
-		let status = this.spawnGit([
-			'-c sequence.editor="ts-node "H:\\shared\\digipowers\\vscode-git-graph\\src\\rebase.ts"',
-			'-c',
-			'core.editor="code --wait"',
-			'rebase',
-			'-i',
-			'HEAD~3'
+		let errorMsg = await this._checkCommitIsOnCurrentBranch(repo, commitHash);
+		if (errorMsg)
+			return errorMsg;
+
+		errorMsg = await this._checkCommitIsOnCurrentBranch(repo, compareWithHash);
+		if (errorMsg)
+			return errorMsg;
+
+		return this.spawnGit([
+			'rev-list',
+			'--count',
+			commitHash + '^..HEAD'
 		], repo, (stdout) => {
-			if (stdout !== '')
+			return stdout.trim(); // /.replace(/\s+/g, ' ');
+		}).then(numCommits1 => {
+			return this.spawnGit([
+				'rev-list',
+				'--count',
+				compareWithHash + '^..HEAD'
+			], repo, (stdout) => {
+				return [parseInt(numCommits1), parseInt(stdout.trim())]; // /.replace(/\s+/g, ' ');
+			});
+		}).then(arr => {
+
+			let numCommits1 = arr[0];
+			let numCommits2 = arr[1];
+
+			let numCommits = Math.max(numCommits1, numCommits2);
+			let countToCombine = Math.abs(numCommits1 - numCommits2) + 1;
+
+			const path = require('path');
+			const currentFilePath = __filename;
+			const currentDirectoryPath = path.dirname(currentFilePath).replace(/\\/g, '/');
+
+			// Actually don't quote it per https://stackoverflow.com/questions/12310468/node-js-child-process-issue-with-args-quotes-issue-ffmpeg-issue
+			return this.spawnGit([
+				'-c',
+				// eslint-disable-next-line
+				`sequence.editor=node ${currentDirectoryPath}/rebase.js --action combine --n ${numCommits} --c ${countToCombine}`,
+				'-c',
+				// eslint-disable-next-line
+				"core.editor=code --wait",
+				'rebase',
+				'-i',
+				'HEAD~' + numCommits
+			], repo, (stdout) => {
+				// if (stdout !== '')
 				return stdout; // .trim().replace(/\s+/g, ' ');
-		}).then((subject) => subject, () => null);
+			}).then((subject) => {
+				if (subject.match(/Action combine complete:/))
+					return null;
+				return subject;
+			}, (stderr: string) => {
+				// This isn't a real error
+				if (stderr.match(/Aborting commit due to empty commit message./)) {
 
-		// let status = this.runGitCommand(['status', '--porcelain=v1', '--untracked-files=no'], repo);
-		// console.log(status);
+					// Do the abort
+					return this.runGitCommand(['rebase', '--abort'], repo);
 
-		// let args = ['checkout'];
-		// if (remoteBranch === null) args.push(branchName);
-		// else args.push('-b', branchName, remoteBranch);
-
-		return status;
+				}
+				this.logger.logCmd('combineCommit failed: ' + stderr, []);
+				return stderr;
+			});
+		}, () => null);
 	}
 
 	/**
-	 * Reword the message of a commit.
+	 * Verify commit is on current branch.
 	 *
-	 * @param repo The path of the repository.
-	 * @param commitHash The hash of the commit to reword.
-	 * @returns The ErrorInfo from the executed command.
+	 * @return string	Returns error message, or empty string if no error.
 	 */
-	public async rewordCommit(repo: string, commitHash: string) {
-
+	private async _checkCommitIsOnCurrentBranch(repo:string, commitHash:string):Promise<string> {
 		let status = await this.spawnGit(['status'], repo, (stdout) => {
 			return stdout.trim(); // /.replace(/\s+/g, ' ');
 		});
@@ -1002,7 +1034,50 @@ export class DataSource extends Disposable {
 			return stdout.trim().split(/\r\n|\r|\n/).includes(currentBranch);
 		});
 		if (!inCurrentBranch) return `Commit is not in the current branch "${currentBranch}".`;
+		return '';
+	}
 
+	/**
+	 * Reword the message of a commit.  Must be on current branch.
+	 *
+	 * @param repo The path of the repository.
+	 * @param commitHash The hash of the commit to reword.
+	 * @returns The ErrorInfo from the executed command.
+	 */
+	public async rewordCommit(repo: string, commitHash: string) {
+
+		let errorMsg = await this._checkCommitIsOnCurrentBranch(repo, commitHash);
+		if (errorMsg)
+			return errorMsg;
+		/*
+		let status = await this.spawnGit(['status'], repo, (stdout) => {
+			return stdout.trim(); // /.replace(/\s+/g, ' ');
+		});
+		if (!status) return 'Error in git status';
+		if (status.match(/^interactive rebase in progress/)) {
+			return 'Rebase in progress, abort it first';
+		}
+
+		let currentBranch = '';
+		let matches = status.match(/^On branch (.+)(\r|\n)/);
+		if (matches) {
+			currentBranch = matches[1];
+		}
+		if (!currentBranch) {
+			// git rebase --show-current-patch  => errors if no rebase in progress
+			return 'No current branch';
+		}
+
+		let inCurrentBranch = await this.spawnGit([
+			'branch',
+			'--format=%(refname:short)',
+			'--contains',
+			commitHash
+		], repo, stdout => {
+			return stdout.trim().split(/\r\n|\r|\n/).includes(currentBranch);
+		});
+		if (!inCurrentBranch) return `Commit is not in the current branch "${currentBranch}".`;
+*/
 		return this.spawnGit([
 			'rev-list',
 			'--count',
@@ -1030,7 +1105,7 @@ export class DataSource extends Disposable {
 				// if (stdout !== '')
 				return stdout; // .trim().replace(/\s+/g, ' ');
 			}).then((subject) => {
-				if (subject.match(/Reword complete:/))
+				if (subject.match(/Action reword complete:/))
 					return null;
 				return subject;
 			}, (stderr: string) => {

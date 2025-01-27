@@ -1249,18 +1249,17 @@ class GitGraphView {
 				}
 			}, {
 				title: 'Combine Commits' + ELLIPSIS,
-				visible: true, //	visibility.drop && this.graph.dropCommitPossible(this.commitLookup[hash]),
+				visible: this.expandedCommit !== null, //	visibility.drop && this.graph.dropCommitPossible(this.commitLookup[hash]),
 				onClick: () => {
-					debugger;
-					dialog.showConfirmation('Combine text goes here', 'Yes, combine', () => {
-						runAction({
-							command: 'combineCommits',
-							repo: this.currentRepo,
-							numCommits: 3,
-							firstCommit: 1
-							/* commitHash: hash */
-						}, 'Combining Commit');
-					}, target);
+					// debugger;
+					// dialog.showConfirmation('Combine text goes here', 'Yes, combine', () => {
+					runAction({
+						command: 'combineCommits',
+						repo: this.currentRepo,
+						commitHash: hash,
+						compareWithHash: this.expandedCommit ? this.expandedCommit.commitHash : ''
+					}, 'Combining Commit');
+					// }, target);
 				}
 			},
 			{
@@ -3354,11 +3353,9 @@ window.addEventListener('load', () => {
 				refreshOrDisplayError(msg.error, 'Unable to Clean Untracked Files');
 				break;
 			case 'combineCommits':
-				debugger;
 				refreshOrDisplayError(msg.error, 'Unable to Combine Commits');
 				break;
 			case 'rewordCommit':
-				debugger;
 				refreshOrDisplayError(msg.error, 'Unable to Reword Commit');
 				break;
 			case 'commitDetails':

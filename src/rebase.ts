@@ -165,7 +165,7 @@ getLatestCommits(numCommitsBack)
 				exit(1);
 			}
 
-			console.log(`Reword complete: ${options.filename}`);
+			console.log(`Action ${action} complete: ${options.filename}`);
 		});
 	})
 	.catch(error => {
