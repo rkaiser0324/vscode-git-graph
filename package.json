@@ -1,13 +1,13 @@
 {
-	"name": "git-graph-2",
-	"displayName": "Git Graph 2",
+	"name": "git-graph-3",
+	"displayName": "Git Graph 3",
 	"version": "1.31.1",
-	"publisher": "hansu",
+	"publisher": "rkaiser0324",
 	"author": {
 		"name": "Michael Hutchison",
 		"email": "mhutchie@16right.com"
 	},
-	"description": "Fork of mhutchie's Git Graph with further improvements.",
+	"description": "Fork of hansu's fork of mhutchie's Git Graph with further improvements.",
 	"keywords": [
 		"git",
 		"graph",
