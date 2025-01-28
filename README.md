@@ -28,6 +28,7 @@ Per [Contributing](CONTRIBUTING.md):
 1. Open a folder containing a git repo
 1. Open the Git Graph tab
 1. Open the Output window on the bottom, and select "Git Graph" to see log messages
+1. To package it into a VSIX, update the run `npm run package`.
 
 ## Features
 
