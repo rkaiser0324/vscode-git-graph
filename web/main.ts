@@ -1246,6 +1246,28 @@ class GitGraphView {
 						runAction({ command: 'dropCommit', repo: this.currentRepo, commitHash: hash }, 'Dropping Commit');
 					}, target);
 				}
+			}, {
+				title: 'Combine Commits' + ELLIPSIS,
+				visible: this.expandedCommit !== null && this.expandedCommit.commitHash !== hash,
+				onClick: () => {
+					runAction({
+						command: 'combineCommits',
+						repo: this.currentRepo,
+						commitHash: hash,
+						compareWithHash: this.expandedCommit ? this.expandedCommit.commitHash : ''
+					}, 'Combining Commit');
+				}
+			},
+			{
+				title: 'Reword Commit' + ELLIPSIS,
+				visible: true,
+				onClick: () => {
+					runAction({
+						command: 'rewordCommit',
+						repo: this.currentRepo,
+						commitHash: hash
+					}, 'Rewording Commit');
+				}
 			}
 		], [
 			{
@@ -3323,6 +3345,12 @@ window.addEventListener('load', () => {
 				break;
 			case 'cleanUntrackedFiles':
 				refreshOrDisplayError(msg.error, 'Unable to Clean Untracked Files');
+				break;
+			case 'combineCommits':
+				refreshOrDisplayError(msg.error, 'Unable to Combine Commits');
+				break;
+			case 'rewordCommit':
+				refreshOrDisplayError(msg.error, 'Unable to Reword Commit');
 				break;
 			case 'commitDetails':
 				if (msg.commitDetails !== null) {

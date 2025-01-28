@@ -24,8 +24,8 @@ export class StatusBarItem extends Disposable {
 		this.logger = logger;
 
 		const statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 1);
-		statusBarItem.text = 'Git Graph';
-		statusBarItem.tooltip = 'View Git Graph';
+		statusBarItem.text = 'Git Graph 3';
+		statusBarItem.tooltip = 'View Git Graph 3';
 		statusBarItem.command = 'git-graph.view';
 		this.statusBarItem = statusBarItem;
 

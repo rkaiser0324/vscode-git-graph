@@ -234,6 +234,18 @@ export class GitGraphView extends Disposable {
 					error: await this.dataSource.cleanUntrackedFiles(msg.repo, msg.directories)
 				});
 				break;
+			case 'combineCommits':
+				this.sendMessage({
+					command: 'rewordCommit',
+					error: await this.dataSource.combineCommits(msg.repo, msg.commitHash, msg.compareWithHash)
+				});
+				break;
+			case 'rewordCommit':
+				this.sendMessage({
+					command: 'rewordCommit',
+					error: await this.dataSource.rewordCommit(msg.repo, msg.commitHash)
+				});
+				break;
 			case 'commitDetails':
 				let data = await Promise.all<GitCommitDetailsData, string | null>([
 					msg.commitHash === UNCOMMITTED
