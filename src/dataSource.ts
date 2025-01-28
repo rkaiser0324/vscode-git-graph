@@ -2065,13 +2065,6 @@ export class DataSource extends Disposable {
 	 * @param ignoreExitCode Ignore the exit code returned by Git (default: `FALSE`).
 	 */
 	private _spawnGit<T>(args: string[], repo: string, resolveValue: { (stdout: Buffer, stderr: string): T }, ignoreExitCode: boolean = false) {
-
-		// let shell = false;
-		// if (args.join(' ').includes('code --wait')) {
-
-		// 	// debugger;
-		// 	// shell = true;
-		// }
 		return new Promise<T>((resolve, reject) => {
 			if (this.gitExecutable === null) {
 				return reject(UNABLE_TO_FIND_GIT_MSG);

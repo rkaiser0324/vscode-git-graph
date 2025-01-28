@@ -959,7 +959,6 @@ class GitGraphView {
 							this.requestCommitComparison(expandedCommit.commitHash, expandedCommit.compareWithHash, true);
 						}
 					} else {
-						// commit comparison closed.
 						this.loadCommitComparison(commitElem, compareWithElem!);
 					}
 				}
@@ -2313,7 +2312,6 @@ class GitGraphView {
 						if (this.expandedCommit.compareWithHash === commit.hash) {
 							this.closeCommitComparison(true);
 						} else if (this.expandedCommit.commitElem !== null) {
-							// This is where you have a commit open, and then click another one with Ctrl held down
 							this.loadCommitComparison(this.expandedCommit.commitElem, eventElem);
 						}
 					} else {

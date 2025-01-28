@@ -7,7 +7,7 @@
 		"name": "Michael Hutchison",
 		"email": "mhutchie@16right.com"
 	},
-	"description": "Fork of hansu's fork of mhutchie's Git Graph with further improvements.",
+	"description": "Fork of mhutchie's Git Graph with further improvements.",
 	"keywords": [
 		"git",
 		"graph",

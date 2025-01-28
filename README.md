@@ -1,6 +1,6 @@
-# Git Graph extension for Visual Studio Code
+# Git Graph 3 extension for Visual Studio Code
 
-Fork of mhutchies Git Graph with further improvements.  
+Fork of mhutchie's Git Graph with further improvements.  
 
 Main improvements:
 
@@ -9,26 +9,31 @@ Main improvements:
 * Resize column width without header (hansu#4)
 * Added author filter (hansu#1)
 * Added sticky header option (mhutchie#132)
+* Add Reword Commit and Combine Commits
 
 ![Additions](https://github.com/hansu/vscode-git-graph/raw/master/resources/demo.gif)
 
-## Developmentt
+## Development
 
-Compile automatically:
+Per [Contributing](CONTRIBUTING.md):
+
+Compile automatically via:
 ```bash
 # all the frontend and backend code
 npm run watch
-# or a single file
+# or a single file, e.g.
 npm run watch src/rebase.ts
 ```
 
-Per [Contributing](CONTRIBUTING.md):
+Then, to launch a debugging session:
 1. `npm run compile-web-debug`
-1. <kbd>F5</kbd> to run `npm run compile-src` and launch the Extension Development Host in a new window
+1. <kbd>F5</kbd> will run `npm run compile-src` and launch the Extension Development Host in a new window
 1. Open a folder containing a git repo
-1. Open the Git Graph tab
+1. Open the Git Graph tab via the "Git Graph 3" button at the bottom
 1. Open the Output window on the bottom, and select "Git Graph" to see log messages
-1. To package it into a VSIX, update the run `npm run package`.
+1. To debug the frontend code, go to Help->Toggle Developer Tools to set breakpoints etc.
+
+To package it into a VSIX, update the version in [package.json](/package.json) and run `npm run package`.
 
 ## Features
 

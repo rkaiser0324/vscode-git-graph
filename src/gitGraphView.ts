@@ -235,33 +235,10 @@ export class GitGraphView extends Disposable {
 				});
 				break;
 			case 'combineCommits':
-
 				this.sendMessage({
 					command: 'rewordCommit',
 					error: await this.dataSource.combineCommits(msg.repo, msg.commitHash, msg.compareWithHash)
 				});
-				// rwk
-
-				// eslint-disable-next-line
-				// @ts-ignore-next-line
-				// let _data = this.dataSource.combineCommits(msg.repo, 1, 3);
-				// console.log(_data);
-
-
-				// let data = await Promise.all<GitCommitDetailsData, string | null>([
-				// 	msg.commitHash === UNCOMMITTED
-				// 		? this.dataSource.getUncommittedDetails(msg.repo)
-				// 		: msg.stash === null
-				// 			? this.dataSource.getCommitDetails(msg.repo, msg.commitHash, msg.hasParents)
-				// 			: this.dataSource.getStashDetails(msg.repo, msg.commitHash, msg.stash),
-				// 	msg.avatarEmail !== null ? this.avatarManager.getAvatarImage(msg.avatarEmail) : Promise.resolve(null)
-				// ]);
-
-				// debugger;
-				// this.sendMessage({
-				// 	command: 'combineCommits',
-				// 	error: 'there was an error'
-				// });
 				break;
 			case 'rewordCommit':
 				this.sendMessage({
