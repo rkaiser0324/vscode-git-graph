@@ -1249,29 +1249,25 @@ class GitGraphView {
 				}
 			}, {
 				title: 'Combine Commits' + ELLIPSIS,
-				visible: this.expandedCommit !== null, //	visibility.drop && this.graph.dropCommitPossible(this.commitLookup[hash]),
+				visible: this.expandedCommit !== null && this.expandedCommit.commitHash !== hash,
 				onClick: () => {
-					// debugger;
-					// dialog.showConfirmation('Combine text goes here', 'Yes, combine', () => {
 					runAction({
 						command: 'combineCommits',
 						repo: this.currentRepo,
 						commitHash: hash,
 						compareWithHash: this.expandedCommit ? this.expandedCommit.commitHash : ''
 					}, 'Combining Commit');
-					// }, target);
 				}
 			},
 			{
 				title: 'Reword Commit' + ELLIPSIS,
-				visible: true, //	visibility.drop && this.graph.dropCommitPossible(this.commitLookup[hash]),
+				visible: true,
 				onClick: () => {
 					runAction({
 						command: 'rewordCommit',
 						repo: this.currentRepo,
 						commitHash: hash
 					}, 'Rewording Commit');
-
 				}
 			}
 		], [
